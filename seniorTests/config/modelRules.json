@@ -1,0 +1,9 @@
+{
+  "Object": {
+    "target": "Object",
+    "fields": [
+      "username",
+      "role"
+    ]
+  }
+}

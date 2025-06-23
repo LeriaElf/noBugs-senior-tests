@@ -14,7 +14,7 @@ export default class ApiConfig {
         return {
             headers: {
                 ...this.#defaultHeaders,
-                'Authorization': 'Basic YWRtaW46YWRtaW4=',
+                'Authorization': `Basic ${process.env.ADMIN_TOKEN}`,
             },
         }
     }
@@ -23,7 +23,7 @@ export default class ApiConfig {
         return {
           headers: {
             ...this.#defaultHeaders,
-            'Authorization': `Basic ${token}`
+            'Authorization': `${token}`
           }
         };
       }
