@@ -1,7 +1,7 @@
-import BaseModel from "./baseModel.js";
+import { BaseModel } from "./baseModel.js";
 
-export default class LoginUserRequest extends BaseModel {
-    constructor({ username, password }) {
-        super({ username, password });
-    }
+export class LoginUserRequest extends BaseModel {
+  constructor({ username, password }) {
+    super({ username, password });
+  }
 }

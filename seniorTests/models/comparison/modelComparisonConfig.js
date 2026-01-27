@@ -1,4 +1,4 @@
-import fs from 'fs/promises';
+import fs from "fs/promises";
 
 const configCache = new Map();
 
@@ -9,7 +9,7 @@ export const loadComparisonRules = async (filePath) => {
 
   let rawData;
   try {
-    rawData = await fs.readFile(filePath, 'utf-8');
+    rawData = await fs.readFile(filePath, "utf-8");
   } catch (err) {
     throw new Error(`Config file not found: ${filePath}`);
   }
@@ -30,21 +30,23 @@ const parseConfig = (rawConfig) => {
     }
 
     const fieldMappings = ruleConfig.fields.reduce((map, fieldRule) => {
-      const [reqField, resField = reqField] = fieldRule.split('=').map(s => s.trim());
+      const [reqField, resField = reqField] = fieldRule
+        .split("=")
+        .map((s) => s.trim());
       map[reqField] = resField;
       return map;
     }, {});
 
     rules.set(requestClass, {
-      target: ruleConfig.target,  
-      fieldMappings,             
-      toString() {             
+      target: ruleConfig.target,
+      fieldMappings,
+      toString() {
         return `Rule for ${requestClass} → ${this.target}`;
-      }
+      },
     });
   }
 
-  return Object.freeze(rules); 
+  return Object.freeze(rules);
 };
 
 export const getRuleFor = (rules, requestClassName) => {

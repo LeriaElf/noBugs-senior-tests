@@ -1,0 +1,111 @@
+import { expect } from "chai";
+import { AdminSteps } from "../utils/steps/adminSteps.js";
+import { HTTP_STATUS } from "../utils/httpStatus.js";
+import { ENPOINT_KEY } from "../utils/enpoints.js";
+import { requester } from "../utils/requester.js";
+import { ApiConfig } from "../utils/apiConfig.js";
+import { UserSteps } from "../utils/steps/userSteps.js";
+import { ErrorHandlingRequester } from "../utils/errorHandlingRequester.js";
+import { ExpectedError } from "../models/expectedError.js";
+import { PutCustomerProfileRequest } from "../models/putCustomerProfileRequest.js";
+
+describe("Customer Servise tests", function () {
+  let token;
+
+  const errorRequester = new ErrorHandlingRequester();
+
+  before(async () => {
+    const { requestData } = await AdminSteps.createUser();
+    token = await UserSteps.loginUser(
+      requestData.username,
+      requestData.password,
+    );
+  });
+
+  it("User shoud be able to get customer profile", async () => {
+    const { status, data } = await requester.request(
+      ENPOINT_KEY.CUSTOMER_PROFILE_GET,
+      {
+        config: ApiConfig.getUserAuth(token),
+      },
+    );
+
+    expect(status).to.equal(HTTP_STATUS.OK);
+    expect(data.name).to.be.null;
+  });
+
+  it("User shoud be able to change profile name", async () => {
+    const profileName = PutCustomerProfileRequest.generateProfileName();
+
+    const { status, data } = await requester.request(
+      ENPOINT_KEY.CUSTOMER_PROFILE_PUT,
+      {
+        data: profileName,
+        config: ApiConfig.getUserAuth(token),
+      },
+    );
+
+    expect(status).to.equal(HTTP_STATUS.OK);
+    expect(data.message).to.equal("Profile updated successfully");
+    expect(data.customer.name).to.equal(profileName.name);
+  });
+
+  const validNames = [
+    "Qwe Wqe",
+    "Qweqweqweqweqwe Qweqweqweqweqwe",
+    "QWE QWE",
+    "qwe qwe",
+  ];
+
+  validNames.forEach((name) => {
+    it(`User shoud be able to change profile name with - "${name}"`, async () => {
+      const { status, data } = await requester.request(
+        ENPOINT_KEY.CUSTOMER_PROFILE_PUT,
+        {
+          data: new PutCustomerProfileRequest({ name }),
+          config: ApiConfig.getUserAuth(token),
+        },
+      );
+
+      expect(status).to.equal(HTTP_STATUS.OK);
+      expect(data.message).to.equal("Profile updated successfully");
+      expect(data.customer.name).to.equal(name);
+    });
+  });
+
+  const invalidNames = [
+    "",
+    " ",
+    "A A",
+    "Al Al",
+    "Alice \nAlice",
+    "Alice \tAlice",
+    " Alice Alice",
+    "QweqweqweqQweqweqweqQweqweqweqQweqweqweqQweqweqweqq QweqweqweqQweqweqweqQweqweqweqQweqweqweqQweqweqweqq",
+    "Élise Qwe",
+    "Alice",
+    "Alice1 Alice",
+    "Alice! Alice",
+    "Alice  Alice",
+  ];
+
+  invalidNames.forEach((name) => {
+    it(`User shoud not be able to change profile name with - "${name}"`, async () => {
+      const requestData = new PutCustomerProfileRequest({ name });
+
+      const expectedError = new ExpectedError({
+        statusCode: HTTP_STATUS.BAD_REQUEST,
+        errorMessages: "Name must contain two words with letters only",
+      });
+
+      await errorRequester.requestExpectingError(
+        ENPOINT_KEY.CUSTOMER_PROFILE_PUT,
+        {
+          data: requestData,
+          config: ApiConfig.getUserAuth(token),
+          expectedError,
+        },
+      );
+    });
+  });
+});
