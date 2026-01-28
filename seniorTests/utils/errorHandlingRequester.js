@@ -1,6 +1,6 @@
 import { requester } from "./requester.js";
 
-export class ErrorHandlingRequester {
+class ErrorHandlingRequester {
   async requestExpectingError(
     endpointKey,
     { data = null, config = {}, expectedError },
@@ -49,3 +49,5 @@ export class ErrorHandlingRequester {
     }
   }
 }
+
+export const errorHandlingRequester = new ErrorHandlingRequester();

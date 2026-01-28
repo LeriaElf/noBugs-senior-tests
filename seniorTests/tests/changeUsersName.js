@@ -5,14 +5,12 @@ import { ENPOINT_KEY } from "../utils/enpoints.js";
 import { requester } from "../utils/requester.js";
 import { ApiConfig } from "../utils/apiConfig.js";
 import { UserSteps } from "../utils/steps/userSteps.js";
-import { ErrorHandlingRequester } from "../utils/errorHandlingRequester.js";
+import { errorHandlingRequester } from "../utils/errorHandlingRequester.js";
 import { ExpectedError } from "../models/expectedError.js";
 import { PutCustomerProfileRequest } from "../models/putCustomerProfileRequest.js";
 
 describe("Customer Servise tests", function () {
   let token;
-
-  const errorRequester = new ErrorHandlingRequester();
 
   before(async () => {
     const { requestData } = await AdminSteps.createUser();
@@ -98,7 +96,7 @@ describe("Customer Servise tests", function () {
         errorMessages: "Name must contain two words with letters only",
       });
 
-      await errorRequester.requestExpectingError(
+      await errorHandlingRequester.requestExpectingError(
         ENPOINT_KEY.CUSTOMER_PROFILE_PUT,
         {
           data: requestData,

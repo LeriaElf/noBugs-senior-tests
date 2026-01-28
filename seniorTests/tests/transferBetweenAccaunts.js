@@ -4,7 +4,7 @@ import { ENPOINT_KEY } from "../utils/enpoints.js";
 import { requester } from "../utils/requester.js";
 import { ApiConfig } from "../utils/apiConfig.js";
 import { UserSteps } from "../utils/steps/userSteps.js";
-import { ErrorHandlingRequester } from "../utils/errorHandlingRequester.js";
+import { errorHandlingRequester } from "../utils/errorHandlingRequester.js";
 import { AccountTransferRequest } from "../models/accountTransferRequest.js";
 import { AccountTransferResponse } from "../models/accountTransferResponse.js";
 import { assertThatModels } from "../models/comparison/modelAssertions.js";
@@ -13,8 +13,6 @@ import { ExpectedError } from "../models/expectedError.js";
 describe("Transfer Service tests", function () {
   let token;
   let accountIds;
-
-  const errorRequester = new ErrorHandlingRequester();
 
   before(async () => {
     const response = await UserSteps.createUserWithAccounts(3);
@@ -157,7 +155,7 @@ describe("Transfer Service tests", function () {
       ],
     });
 
-    await errorRequester.requestExpectingError(ENPOINT_KEY.ACCOUNTS_TRANSFER, {
+    await errorHandlingRequester.requestExpectingError(ENPOINT_KEY.ACCOUNTS_TRANSFER, {
       data: requestData,
       config: ApiConfig.getUserAuth(token),
       expectedError,
@@ -181,7 +179,7 @@ describe("Transfer Service tests", function () {
       ],
     });
 
-    await errorRequester.requestExpectingError(ENPOINT_KEY.ACCOUNTS_TRANSFER, {
+    await errorHandlingRequester.requestExpectingError(ENPOINT_KEY.ACCOUNTS_TRANSFER, {
       data: requestData,
       config: ApiConfig.getUserAuth(token),
       expectedError,
@@ -206,7 +204,7 @@ describe("Transfer Service tests", function () {
       errorMessages: ["Transfer amount cannot exceed 10000"],
     });
 
-    await errorRequester.requestExpectingError(ENPOINT_KEY.ACCOUNTS_TRANSFER, {
+    await errorHandlingRequester.requestExpectingError(ENPOINT_KEY.ACCOUNTS_TRANSFER, {
       data: requestData,
       config: ApiConfig.getUserAuth(token),
       expectedError,
@@ -250,7 +248,7 @@ describe("Transfer Service tests", function () {
         errorMessages,
       });
 
-      await errorRequester.requestExpectingError(
+      await errorHandlingRequester.requestExpectingError(
         ENPOINT_KEY.ACCOUNTS_TRANSFER,
         {
           data: requestData,

@@ -2,7 +2,7 @@ import { assertThatModels } from "../models/comparison/modelAssertions.js";
 import { AdminSteps } from "../utils/steps/adminSteps.js";
 import { HTTP_STATUS } from "../utils/httpStatus.js";
 import { expect } from "chai";
-import { ErrorHandlingRequester } from "../utils/errorHandlingRequester.js";
+import { errorHandlingRequester } from "../utils/errorHandlingRequester.js";
 import { ExpectedError } from "../models/expectedError.js";
 import { ENPOINT_KEY } from "../utils/enpoints.js";
 import { CreateUserRequest } from "../models/createUserRequset.js";
@@ -53,15 +53,13 @@ describe("Admin Servise tests", function () {
 
   invalidDataUsername.forEach(({ username, role, errorKey, errorMessages }) => {
     it(`Admin should not be able to create new user with invalid ${errorKey} - "${username}"`, async function () {
-      const errorRequest = new ErrorHandlingRequester();
-
       const expectedError = new ExpectedError({
         statusCode: HTTP_STATUS.BAD_REQUEST,
         errorKey,
         errorMessages,
       });
 
-      await errorRequest.requestExpectingError(ENPOINT_KEY.ADMIN_USER, {
+      await errorHandlingRequester.requestExpectingError(ENPOINT_KEY.ADMIN_USER, {
         data: CreateUserRequest.generateUserData({ username, role }),
         config: ApiConfig.adminAuth,
         expectedError,
@@ -116,15 +114,13 @@ describe("Admin Servise tests", function () {
 
   invalidDataPassword.forEach(({ password, role, errorKey, errorMessages }) => {
     it(`Admin should not be able to create new user with invalid ${errorKey} - "${password}"`, async function () {
-      const errorRequest = new ErrorHandlingRequester();
-
       const expectedError = new ExpectedError({
         statusCode: HTTP_STATUS.BAD_REQUEST,
         errorKey,
         errorMessages,
       });
 
-      await errorRequest.requestExpectingError(ENPOINT_KEY.ADMIN_USER, {
+      await errorHandlingRequester.requestExpectingError(ENPOINT_KEY.ADMIN_USER, {
         data: CreateUserRequest.generateUserData({ password, role }),
         config: ApiConfig.adminAuth,
         expectedError,
