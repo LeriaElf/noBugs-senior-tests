@@ -1,5 +1,7 @@
 import { HttpClient } from "./httpClient.js";
 import { endpoints } from "./enpoints.js";
+import { validateResponseSchema } from "./schemaValidator.js";
+import { stepLogger } from "./stepLogger.js";
 
 class Requester {
   constructor() {
@@ -20,6 +22,8 @@ class Requester {
     const requestData = data?.toJson ? data?.toJson() : data;
     const httpMethod = method.toLowerCase();
 
+    stepLogger.request(httpMethod, url, requestData);
+
     try {
       let response;
 
@@ -32,6 +36,12 @@ class Requester {
         response = await this.httpClient[httpMethod](url, requestData, config);
       }
 
+      stepLogger.response(response.status, responseModel?.name);
+
+      if (responseModel) {
+        validateResponseSchema(responseModel.name, response.data);
+      }
+
       const responseData = responseModel
         ? this.#instantiateModel(responseModel, response.data)
         : response.data;
@@ -42,6 +52,9 @@ class Requester {
         headers: response.headers,
       };
     } catch (error) {
+      if (error.response) {
+        stepLogger.error(error.response.status, error.response.data);
+      }
       throw error;
     }
   }
