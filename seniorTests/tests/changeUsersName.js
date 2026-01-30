@@ -8,6 +8,7 @@ import { UserSteps } from "../utils/steps/userSteps.js";
 import { errorHandlingRequester } from "../utils/errorHandlingRequester.js";
 import { ExpectedError } from "../models/expectedError.js";
 import { PutCustomerProfileRequest } from "../models/putCustomerProfileRequest.js";
+import { CUSTOMER_RESPONSE_MESSAGES } from "../utils/responseSpec.js";
 
 describe("Customer Servise tests", function () {
   let token;
@@ -44,7 +45,7 @@ describe("Customer Servise tests", function () {
     );
 
     expect(status).to.equal(HTTP_STATUS.OK);
-    expect(data.message).to.equal("Profile updated successfully");
+    expect(data.message).to.equal(CUSTOMER_RESPONSE_MESSAGES.PROFILE_UPDATED);
     expect(data.customer.name).to.equal(profileName.name);
   });
 
@@ -66,7 +67,7 @@ describe("Customer Servise tests", function () {
       );
 
       expect(status).to.equal(HTTP_STATUS.OK);
-      expect(data.message).to.equal("Profile updated successfully");
+      expect(data.message).to.equal(CUSTOMER_RESPONSE_MESSAGES.PROFILE_UPDATED);
       expect(data.customer.name).to.equal(name);
     });
   });
@@ -93,7 +94,7 @@ describe("Customer Servise tests", function () {
 
       const expectedError = new ExpectedError({
         statusCode: HTTP_STATUS.BAD_REQUEST,
-        errorMessages: "Name must contain two words with letters only",
+        errorMessages: CUSTOMER_RESPONSE_MESSAGES.NAME_ERROR,
       });
 
       await errorHandlingRequester.requestExpectingError(

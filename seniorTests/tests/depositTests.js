@@ -8,6 +8,10 @@ import { UserSteps } from "../utils/steps/userSteps.js";
 import { errorHandlingRequester } from "../utils/errorHandlingRequester.js";
 import { AccountDepositRequest } from "../models/accountDepositRequest.js";
 import { ExpectedError } from "../models/expectedError.js";
+import {
+  DEPOSIT_RESPONSE_MESSAGES,
+  DEPOSIT_ERRORS,
+} from "../utils/responseSpec.js";
 
 describe("Deposit Servise tests", function () {
   let token;
@@ -53,20 +57,23 @@ describe("Deposit Servise tests", function () {
     const expectedError = new ExpectedError({
       statusCode: HTTP_STATUS.FORBIDDEN,
       errorKey: "error",
-      errorMessages: ["Unauthorized access to account"],
+      errorMessages: [DEPOSIT_RESPONSE_MESSAGES.UNAUTHORASED_ACCESS],
     });
 
-    await errorHandlingRequester.requestExpectingError(ENPOINT_KEY.ACCOUNTS_DEPOSIT, {
-      data: new AccountDepositRequest({ id: accountId + 100, balance }),
-      config: ApiConfig.getUserAuth(token),
-      expectedError,
-    });
+    await errorHandlingRequester.requestExpectingError(
+      ENPOINT_KEY.ACCOUNTS_DEPOSIT,
+      {
+        data: new AccountDepositRequest({ id: accountId + 100, balance }),
+        config: ApiConfig.getUserAuth(token),
+        expectedError,
+      },
+    );
   });
 
   const invalidAmount = [
-    { amount: 0, errorMessages: ["Deposit amount must be at least 0.01"] },
-    { amount: 5000.01, errorMessages: ["Deposit amount cannot exceed 5000"] },
-    { amount: -1, errorMessages: ["Deposit amount must be at least 0.01"] },
+    { amount: 0, errorMessages: [DEPOSIT_ERRORS.DEPOSIT_MIN] },
+    { amount: 5000.01, errorMessages: [DEPOSIT_ERRORS.DEPOSIT_MAX] },
+    { amount: -1, errorMessages: [DEPOSIT_ERRORS.DEPOSIT_MIN] },
   ];
 
   invalidAmount.forEach(({ amount, errorMessages }) => {
@@ -77,11 +84,14 @@ describe("Deposit Servise tests", function () {
         errorMessages,
       });
 
-      await errorHandlingRequester.requestExpectingError(ENPOINT_KEY.ACCOUNTS_DEPOSIT, {
-        data: new AccountDepositRequest({ id: accountId, balance: amount }),
-        config: ApiConfig.getUserAuth(token),
-        expectedError,
-      });
+      await errorHandlingRequester.requestExpectingError(
+        ENPOINT_KEY.ACCOUNTS_DEPOSIT,
+        {
+          data: new AccountDepositRequest({ id: accountId, balance: amount }),
+          config: ApiConfig.getUserAuth(token),
+          expectedError,
+        },
+      );
     });
   });
 
@@ -89,13 +99,16 @@ describe("Deposit Servise tests", function () {
     const expectedError = new ExpectedError({
       statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR, // API bug: returns 500 instead of 400
       errorKey: "error",
-      errorMessages: ["Internal Server Error"],
+      errorMessages: [DEPOSIT_RESPONSE_MESSAGES.SERVER_ERROR],
     });
 
-    await errorHandlingRequester.requestExpectingError(ENPOINT_KEY.ACCOUNTS_DEPOSIT, {
-      data: new AccountDepositRequest({ id: accountId, balance: "" }),
-      config: ApiConfig.getUserAuth(token),
-      expectedError,
-    });
+    await errorHandlingRequester.requestExpectingError(
+      ENPOINT_KEY.ACCOUNTS_DEPOSIT,
+      {
+        data: new AccountDepositRequest({ id: accountId, balance: "" }),
+        config: ApiConfig.getUserAuth(token),
+        expectedError,
+      },
+    );
   });
 });

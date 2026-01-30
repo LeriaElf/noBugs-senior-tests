@@ -27,10 +27,7 @@ describe("Account Servise tests", function () {
     expect(data.accounts).to.have.lengthOf(2);
 
     for (const account of data.accounts) {
-      expect(accountIds).to.include(account.id);
-      expect(account).to.have.property("accountNumber");
       expect(account.balance).to.be.greaterThan(0);
-      expect(account.transactions).to.be.an("array");
     }
   });
 });

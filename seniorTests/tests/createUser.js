@@ -7,6 +7,7 @@ import { ExpectedError } from "../models/expectedError.js";
 import { ENPOINT_KEY } from "../utils/enpoints.js";
 import { CreateUserRequest } from "../models/createUserRequset.js";
 import { ApiConfig } from "../utils/apiConfig.js";
+import { ADMIN_ERRORS } from "../utils/responseSpec.js";
 
 describe("Admin Servise tests", function () {
   it("Admin shoud be able to create new user", async () => {
@@ -22,9 +23,9 @@ describe("Admin Servise tests", function () {
       role: "USER",
       errorKey: "username",
       errorMessages: [
-        "Username cannot be blank",
-        "Username must contain only letters, digits, dashes, underscores, and dots",
-        "Username must be between 3 and 15 characters",
+        ADMIN_ERRORS.NAME_BLANK,
+        ADMIN_ERRORS.NAME_LENGTH,
+        ADMIN_ERRORS.NAME_MUST_CONTAIN,
       ],
     },
     {
@@ -32,22 +33,22 @@ describe("Admin Servise tests", function () {
       role: "USER",
       errorKey: "username",
       errorMessages: [
-        "Username cannot be blank",
-        "Username must contain only letters, digits, dashes, underscores, and dots",
-        "Username must be between 3 and 15 characters",
+        ADMIN_ERRORS.NAME_BLANK,
+        ADMIN_ERRORS.NAME_LENGTH,
+        ADMIN_ERRORS.NAME_MUST_CONTAIN,
       ],
     },
     {
       username: "qw",
       role: "USER",
       errorKey: "username",
-      errorMessages: ["Username must be between 3 and 15 characters"],
+      errorMessages: [ADMIN_ERRORS.NAME_LENGTH],
     },
     {
       username: "qweqweqweqweqweq",
       role: "USER",
       errorKey: "username",
-      errorMessages: ["Username must be between 3 and 15 characters"],
+      errorMessages: [ADMIN_ERRORS.NAME_LENGTH],
     },
   ];
 
@@ -59,11 +60,14 @@ describe("Admin Servise tests", function () {
         errorMessages,
       });
 
-      await errorHandlingRequester.requestExpectingError(ENPOINT_KEY.ADMIN_USER, {
-        data: CreateUserRequest.generateUserData({ username, role }),
-        config: ApiConfig.adminAuth,
-        expectedError,
-      });
+      await errorHandlingRequester.requestExpectingError(
+        ENPOINT_KEY.ADMIN_USER,
+        {
+          data: CreateUserRequest.generateUserData({ username, role }),
+          config: ApiConfig.adminAuth,
+          expectedError,
+        },
+      );
     });
   });
 
@@ -73,8 +77,8 @@ describe("Admin Servise tests", function () {
       role: "USER",
       errorKey: "password",
       errorMessages: [
-        "Password must contain at least one digit, one lower case, one upper case, one special character, no spaces, and be at least 8 characters long",
-        "Password cannot be blank",
+        ADMIN_ERRORS.PASSWORD_MUST_CONTAIN,
+        ADMIN_ERRORS.PASSWORD_BLANK,
       ],
     },
     {
@@ -82,33 +86,27 @@ describe("Admin Servise tests", function () {
       role: "USER",
       errorKey: "password",
       errorMessages: [
-        "Password must contain at least one digit, one lower case, one upper case, one special character, no spaces, and be at least 8 characters long",
-        "Password cannot be blank",
+        ADMIN_ERRORS.PASSWORD_MUST_CONTAIN,
+        ADMIN_ERRORS.PASSWORD_BLANK,
       ],
     },
     {
       password: "qweQW1!",
       role: "USER",
       errorKey: "password",
-      errorMessages: [
-        "Password must contain at least one digit, one lower case, one upper case, one special character, no spaces, and be at least 8 characters long",
-      ],
+      errorMessages: [ADMIN_ERRORS.PASSWORD_MUST_CONTAIN],
     },
     {
       password: "qweqweqweqweqweq",
       role: "USER",
       errorKey: "password",
-      errorMessages: [
-        "Password must contain at least one digit, one lower case, one upper case, one special character, no spaces, and be at least 8 characters long",
-      ],
+      errorMessages: [ADMIN_ERRORS.PASSWORD_MUST_CONTAIN],
     },
     {
       password: "qweQWE 123!@#",
       role: "USER",
       errorKey: "password",
-      errorMessages: [
-        "Password must contain at least one digit, one lower case, one upper case, one special character, no spaces, and be at least 8 characters long",
-      ],
+      errorMessages: [ADMIN_ERRORS.PASSWORD_MUST_CONTAIN],
     },
   ];
 
@@ -120,11 +118,14 @@ describe("Admin Servise tests", function () {
         errorMessages,
       });
 
-      await errorHandlingRequester.requestExpectingError(ENPOINT_KEY.ADMIN_USER, {
-        data: CreateUserRequest.generateUserData({ password, role }),
-        config: ApiConfig.adminAuth,
-        expectedError,
-      });
+      await errorHandlingRequester.requestExpectingError(
+        ENPOINT_KEY.ADMIN_USER,
+        {
+          data: CreateUserRequest.generateUserData({ password, role }),
+          config: ApiConfig.adminAuth,
+          expectedError,
+        },
+      );
     });
   });
 });

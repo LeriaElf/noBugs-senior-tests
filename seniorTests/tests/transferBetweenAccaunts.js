@@ -9,6 +9,7 @@ import { AccountTransferRequest } from "../models/accountTransferRequest.js";
 import { AccountTransferResponse } from "../models/accountTransferResponse.js";
 import { assertThatModels } from "../models/comparison/modelAssertions.js";
 import { ExpectedError } from "../models/expectedError.js";
+import { TRANSFER_ERRORS } from "../utils/responseSpec.js";
 
 describe("Transfer Service tests", function () {
   let token;
@@ -150,16 +151,17 @@ describe("Transfer Service tests", function () {
     const expectedError = new ExpectedError({
       statusCode: HTTP_STATUS.BAD_REQUEST,
       errorKey: "error",
-      errorMessages: [
-        "Invalid transfer: insufficient funds or invalid accounts",
-      ],
+      errorMessages: [TRANSFER_ERRORS.INVALID_TRANSFER],
     });
 
-    await errorHandlingRequester.requestExpectingError(ENPOINT_KEY.ACCOUNTS_TRANSFER, {
-      data: requestData,
-      config: ApiConfig.getUserAuth(token),
-      expectedError,
-    });
+    await errorHandlingRequester.requestExpectingError(
+      ENPOINT_KEY.ACCOUNTS_TRANSFER,
+      {
+        data: requestData,
+        config: ApiConfig.getUserAuth(token),
+        expectedError,
+      },
+    );
   });
 
   it("User should not be able to transfer to the same account", async () => {
@@ -174,16 +176,17 @@ describe("Transfer Service tests", function () {
     const expectedError = new ExpectedError({
       statusCode: HTTP_STATUS.BAD_REQUEST,
       errorKey: "error",
-      errorMessages: [
-        "Invalid transfer: insufficient funds or invalid accounts",
-      ],
+      errorMessages: [TRANSFER_ERRORS.INVALID_TRANSFER],
     });
 
-    await errorHandlingRequester.requestExpectingError(ENPOINT_KEY.ACCOUNTS_TRANSFER, {
-      data: requestData,
-      config: ApiConfig.getUserAuth(token),
-      expectedError,
-    });
+    await errorHandlingRequester.requestExpectingError(
+      ENPOINT_KEY.ACCOUNTS_TRANSFER,
+      {
+        data: requestData,
+        config: ApiConfig.getUserAuth(token),
+        expectedError,
+      },
+    );
   });
 
   it("User should not be able to transfer more funds from their account than is available there", async () => {
@@ -201,14 +204,17 @@ describe("Transfer Service tests", function () {
     const expectedError = new ExpectedError({
       statusCode: HTTP_STATUS.BAD_REQUEST,
       errorKey: "amount",
-      errorMessages: ["Transfer amount cannot exceed 10000"],
+      errorMessages: [TRANSFER_ERRORS.TRANSFER_MAX],
     });
 
-    await errorHandlingRequester.requestExpectingError(ENPOINT_KEY.ACCOUNTS_TRANSFER, {
-      data: requestData,
-      config: ApiConfig.getUserAuth(token),
-      expectedError,
-    });
+    await errorHandlingRequester.requestExpectingError(
+      ENPOINT_KEY.ACCOUNTS_TRANSFER,
+      {
+        data: requestData,
+        config: ApiConfig.getUserAuth(token),
+        expectedError,
+      },
+    );
 
     const { data: newAccauntsData } =
       await UserSteps.getCustomerAccaunts(token);
@@ -219,13 +225,13 @@ describe("Transfer Service tests", function () {
   });
 
   const invalidData = [
-    { amount: 0, errorMessages: ["Transfer amount must be at least 0.01"] },
+    { amount: 0, errorMessages: [TRANSFER_ERRORS.TRANSFER_MIN] },
     {
       amount: 10000.99,
-      errorMessages: ["Transfer amount cannot exceed 10000"],
+      errorMessages: [TRANSFER_ERRORS.TRANSFER_MAX],
       // errorMessages: ["Invalid transfer: insufficient funds or invalid accounts"],// плавающий
     },
-    { amount: -1, errorMessages: ["Transfer amount must be at least 0.01"] },
+    { amount: -1, errorMessages: [TRANSFER_ERRORS.TRANSFER_MIN] },
   ];
 
   invalidData.forEach(({ amount, errorMessages }) => {
