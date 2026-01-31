@@ -7,7 +7,7 @@ import { ExpectedError } from "../models/expectedError.js";
 import { ENPOINT_KEY } from "../utils/enpoints.js";
 import { CreateUserRequest } from "../models/createUserRequset.js";
 import { ApiConfig } from "../utils/apiConfig.js";
-import { ADMIN_ERRORS } from "../utils/responseSpec.js";
+import { ADMIN_ERRORS, KEY_ERRORS, ROLE } from "../utils/responseSpec.js";
 
 describe("Admin Servise tests", function () {
   it("Admin shoud be able to create new user", async () => {
@@ -20,8 +20,8 @@ describe("Admin Servise tests", function () {
   const invalidDataUsername = [
     {
       username: "",
-      role: "USER",
-      errorKey: "username",
+      role: ROLE.USER,
+      errorKey: KEY_ERRORS.USERNAME,
       errorMessages: [
         ADMIN_ERRORS.NAME_BLANK,
         ADMIN_ERRORS.NAME_LENGTH,
@@ -30,8 +30,8 @@ describe("Admin Servise tests", function () {
     },
     {
       username: " ",
-      role: "USER",
-      errorKey: "username",
+      role: ROLE.USER,
+      errorKey: KEY_ERRORS.USERNAME,
       errorMessages: [
         ADMIN_ERRORS.NAME_BLANK,
         ADMIN_ERRORS.NAME_LENGTH,
@@ -40,14 +40,14 @@ describe("Admin Servise tests", function () {
     },
     {
       username: "qw",
-      role: "USER",
-      errorKey: "username",
+      role: ROLE.USER,
+      errorKey: KEY_ERRORS.USERNAME,
       errorMessages: [ADMIN_ERRORS.NAME_LENGTH],
     },
     {
       username: "qweqweqweqweqweq",
-      role: "USER",
-      errorKey: "username",
+      role: ROLE.USER,
+      errorKey: KEY_ERRORS.USERNAME,
       errorMessages: [ADMIN_ERRORS.NAME_LENGTH],
     },
   ];
@@ -74,8 +74,8 @@ describe("Admin Servise tests", function () {
   const invalidDataPassword = [
     {
       password: "",
-      role: "USER",
-      errorKey: "password",
+      role: ROLE.USER,
+      errorKey: KEY_ERRORS.PASSWORD,
       errorMessages: [
         ADMIN_ERRORS.PASSWORD_MUST_CONTAIN,
         ADMIN_ERRORS.PASSWORD_BLANK,
@@ -83,8 +83,8 @@ describe("Admin Servise tests", function () {
     },
     {
       password: " ",
-      role: "USER",
-      errorKey: "password",
+      role: ROLE.USER,
+      errorKey: KEY_ERRORS.PASSWORD,
       errorMessages: [
         ADMIN_ERRORS.PASSWORD_MUST_CONTAIN,
         ADMIN_ERRORS.PASSWORD_BLANK,
@@ -92,20 +92,20 @@ describe("Admin Servise tests", function () {
     },
     {
       password: "qweQW1!",
-      role: "USER",
-      errorKey: "password",
+      role: ROLE.USER,
+      errorKey: KEY_ERRORS.PASSWORD,
       errorMessages: [ADMIN_ERRORS.PASSWORD_MUST_CONTAIN],
     },
     {
       password: "qweqweqweqweqweq",
-      role: "USER",
-      errorKey: "password",
+      role: ROLE.USER,
+      errorKey: KEY_ERRORS.PASSWORD,
       errorMessages: [ADMIN_ERRORS.PASSWORD_MUST_CONTAIN],
     },
     {
       password: "qweQWE 123!@#",
-      role: "USER",
-      errorKey: "password",
+      role: ROLE.USER,
+      errorKey: KEY_ERRORS.PASSWORD,
       errorMessages: [ADMIN_ERRORS.PASSWORD_MUST_CONTAIN],
     },
   ];

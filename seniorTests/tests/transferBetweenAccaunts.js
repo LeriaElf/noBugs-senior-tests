@@ -22,7 +22,7 @@ describe("Transfer Service tests", function () {
   });
 
   beforeEach(async () => {
-    await UserSteps.depositeToAccount(token, accountIds[0], 1000);
+    await UserSteps.depositeToAccount(token, accountIds[0], 5000);
   });
 
   const validData = [
@@ -139,18 +139,19 @@ describe("Transfer Service tests", function () {
     const { accountIds: newUserAccountIds } =
       await UserSteps.createUserWithAccounts(1);
     const nonExistentAccount = newUserAccountIds[0] + 1000;
+    const sendAmount = AccountTransferRequest.generateTranferData();
 
     const { sender } = await UserSteps.getAccountWithBalance(token);
 
     const requestData = new AccountTransferRequest({
       senderAccountId: sender.id,
       receiverAccountId: nonExistentAccount,
-      amount: 100,
+      amount: sendAmount,
     });
 
     const expectedError = new ExpectedError({
       statusCode: HTTP_STATUS.BAD_REQUEST,
-      errorKey: "error",
+      errorKey: KEY_ERRORS.ERROR,
       errorMessages: [TRANSFER_ERRORS.INVALID_TRANSFER],
     });
 
@@ -166,16 +167,17 @@ describe("Transfer Service tests", function () {
 
   it("User should not be able to transfer to the same account", async () => {
     const { sender } = await UserSteps.getAccountWithBalance(token);
+    const sendAmount = AccountTransferRequest.generateTranferData();
 
     const requestData = new AccountTransferRequest({
       senderAccountId: sender.id,
       receiverAccountId: sender.id,
-      amount: 100,
+      amount: sendAmount,
     });
 
     const expectedError = new ExpectedError({
       statusCode: HTTP_STATUS.BAD_REQUEST,
-      errorKey: "error",
+      errorKey: KEY_ERRORS.ERROR,
       errorMessages: [TRANSFER_ERRORS.INVALID_TRANSFER],
     });
 
@@ -203,7 +205,7 @@ describe("Transfer Service tests", function () {
 
     const expectedError = new ExpectedError({
       statusCode: HTTP_STATUS.BAD_REQUEST,
-      errorKey: "amount",
+      errorKey: KEY_ERRORS.AMOUNT,
       errorMessages: [TRANSFER_ERRORS.TRANSFER_MAX],
     });
 
@@ -250,7 +252,7 @@ describe("Transfer Service tests", function () {
 
       const expectedError = new ExpectedError({
         statusCode: HTTP_STATUS.BAD_REQUEST,
-        errorKey: "amount",
+        errorKey: KEY_ERRORS.AMOUNT,
         errorMessages,
       });
 

@@ -11,6 +11,7 @@ import { ExpectedError } from "../models/expectedError.js";
 import {
   DEPOSIT_RESPONSE_MESSAGES,
   DEPOSIT_ERRORS,
+  KEY_ERRORS,
 } from "../utils/responseSpec.js";
 
 describe("Deposit Servise tests", function () {
@@ -56,7 +57,7 @@ describe("Deposit Servise tests", function () {
 
     const expectedError = new ExpectedError({
       statusCode: HTTP_STATUS.FORBIDDEN,
-      errorKey: "error",
+      errorKey: KEY_ERRORS.ERROR,
       errorMessages: [DEPOSIT_RESPONSE_MESSAGES.UNAUTHORASED_ACCESS],
     });
 
@@ -80,7 +81,7 @@ describe("Deposit Servise tests", function () {
     it(`User shoud not be able to deposit incorrect amount - ${amount} to the account`, async () => {
       const expectedError = new ExpectedError({
         statusCode: HTTP_STATUS.BAD_REQUEST,
-        errorKey: "amount",
+        errorKey: KEY_ERRORS.AMOUNT,
         errorMessages,
       });
 
@@ -98,7 +99,7 @@ describe("Deposit Servise tests", function () {
   it("User should not be able to deposit without amount", async () => {
     const expectedError = new ExpectedError({
       statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR, // API bug: returns 500 instead of 400
-      errorKey: "error",
+      errorKey: KEY_ERRORS.ERROR,
       errorMessages: [DEPOSIT_RESPONSE_MESSAGES.SERVER_ERROR],
     });
 

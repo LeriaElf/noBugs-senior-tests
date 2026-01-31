@@ -28,3 +28,15 @@ export const TRANSFER_ERRORS = {
   TRANSFER_MAX: "Transfer amount cannot exceed 10000",
   TRANSFER_MIN: "Transfer amount must be at least 0.01",
 };
+
+export const KEY_ERRORS = {
+  AMOUNT: "amount",
+  ERROR: "error",
+  USERNAME: "username",
+  PASSWORD: "password",
+};
+
+export const ROLE = {
+  USER: "USER",
+  ADMIN: "ADMIN",
+};
