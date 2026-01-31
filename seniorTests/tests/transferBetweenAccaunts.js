@@ -9,7 +9,7 @@ import { AccountTransferRequest } from "../models/accountTransferRequest.js";
 import { AccountTransferResponse } from "../models/accountTransferResponse.js";
 import { assertThatModels } from "../models/comparison/modelAssertions.js";
 import { ExpectedError } from "../models/expectedError.js";
-import { TRANSFER_ERRORS } from "../utils/responseSpec.js";
+import { TRANSFER_ERRORS, KEY_ERRORS } from "../utils/responseSpec.js";
 
 describe("Transfer Service tests", function () {
   let token;
