@@ -17,16 +17,22 @@ import {
 describe("Deposit Servise tests", function () {
   let token;
   let accountId;
+  let userId;
 
   before(async () => {
-    const { requestData } = await AdminSteps.createUser();
+    const { requestData, responseData } = await AdminSteps.createUser();
     token = await UserSteps.loginUser(
       requestData.username,
       requestData.password,
     );
+    userId = responseData.id;
 
     const account = await UserSteps.createAccount(token);
     accountId = account.accountId;
+  });
+
+  after(async () => {
+    await AdminSteps.deleteUser(userId);
   });
 
   const validAmount = [0.01, 4999.99, 5000];
@@ -49,11 +55,21 @@ describe("Deposit Servise tests", function () {
         (t) => t.amount === amount,
       );
       expect(currentTransaction.relatedAccountId).to.equal(accountId);
+
+      const { data } = await UserSteps.getTransactions(token, accountId);
+      const foundTransaction = data.transactions.find(
+        (tr) => tr.id === currentTransaction.id,
+      );
+      expect(foundTransaction).to.exist;
+      expect(foundTransaction.amount).to.equal(amount);
     });
   });
 
   it("User shoud not be able to deposit money to the others account", async () => {
     const balance = AccountDepositRequest.generateBalanceData();
+
+    const { data } = await UserSteps.getCustomerAccaunts(token);
+    const initialBalance = data.accounts[0].balance;
 
     const expectedError = new ExpectedError({
       statusCode: HTTP_STATUS.FORBIDDEN,
@@ -69,6 +85,9 @@ describe("Deposit Servise tests", function () {
         expectedError,
       },
     );
+
+    const { data: newData } = await UserSteps.getCustomerAccaunts(token);
+    expect(newData.accounts[0].balance).to.equal(initialBalance);
   });
 
   const invalidAmount = [
@@ -85,6 +104,9 @@ describe("Deposit Servise tests", function () {
         errorMessages,
       });
 
+      const { data } = await UserSteps.getCustomerAccaunts(token);
+      const initialBalance = data.accounts[0].balance;
+
       await errorHandlingRequester.requestExpectingError(
         ENPOINT_KEY.ACCOUNTS_DEPOSIT,
         {
@@ -93,10 +115,16 @@ describe("Deposit Servise tests", function () {
           expectedError,
         },
       );
+
+      const { data: newBalance } = await UserSteps.getCustomerAccaunts(token);
+      expect(newBalance.accounts[0].balance).to.equal(initialBalance);
     });
   });
 
   it("User should not be able to deposit without amount", async () => {
+    const { data } = await UserSteps.getCustomerAccaunts(token);
+    const initialBalance = data.accounts[0].balance;
+
     const expectedError = new ExpectedError({
       statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR, // API bug: returns 500 instead of 400
       errorKey: KEY_ERRORS.ERROR,
@@ -111,5 +139,8 @@ describe("Deposit Servise tests", function () {
         expectedError,
       },
     );
+
+    const { data: newData } = await UserSteps.getCustomerAccaunts(token);
+    expect(newData.accounts[0].balance).to.equal(initialBalance);
   });
 });

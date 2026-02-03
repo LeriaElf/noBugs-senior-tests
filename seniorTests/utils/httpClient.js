@@ -44,4 +44,15 @@ export class HttpClient {
       };
     }
   }
+
+  async delete(url, config) {
+    try {
+      return await this.client.delete(url, config);
+    } catch (error) {
+      throw {
+        message: `Request failed with status code ${error.response.status}`,
+        response: error.response,
+      };
+    }
+  }
 }

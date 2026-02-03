@@ -7,11 +7,18 @@ import { requester } from "../utils/requester.js";
 import { LoginUserRequest } from "../models/loginUserRequest.js";
 
 describe("Auth Servise tests", function () {
+  let userId;
+
+  after(async () => {
+    await AdminSteps.deleteUser(userId);
+  });
+
   it("User shoud be able to login after creation by admin", async () => {
-    const { requestData } = await AdminSteps.createUser();
+    const { requestData, responseData } = await AdminSteps.createUser();
 
     const username = requestData.username;
     const password = requestData.password;
+    userId = responseData.id;
 
     const { data, status, headers } = await requester.request(
       ENPOINT_KEY.LOGIN,

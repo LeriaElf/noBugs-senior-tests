@@ -15,7 +15,7 @@ export class UserSteps {
   }
 
   static async createAccount(token) {
-    const response = await requester.request(ENPOINT_KEY.ACCOUNTS, {
+    const response = await requester.request(ENPOINT_KEY.ACCOUNTS_CREATE, {
       data: null,
       config: ApiConfig.getUserAuth(token),
     });
@@ -48,7 +48,7 @@ export class UserSteps {
   }
 
   static async createUserWithAccounts(amountOfAccounts = 2) {
-    const { requestData } = await AdminSteps.createUser();
+    const { requestData, responseData } = await AdminSteps.createUser();
     const token = await this.loginUser(
       requestData.username,
       requestData.password,
@@ -63,7 +63,7 @@ export class UserSteps {
       await this.depositeToAccount(token, account.accountId);
     }
 
-    return { token, accountIds };
+    return { token, accountIds, userId: responseData.id };
   }
 
   static async getCustomerAccaunts(token) {
@@ -77,5 +77,28 @@ export class UserSteps {
     const sender = data.accounts.find((acc) => acc.balance > 0);
 
     return { accounts: data.accounts, sender };
+  }
+
+  static async getUserProfileData(token) {
+    const { status, data } = await requester.request(
+      ENPOINT_KEY.CUSTOMER_PROFILE_GET,
+      {
+        config: ApiConfig.getUserAuth(token),
+      },
+    );
+
+    return { status, data };
+  }
+
+  static async getTransactions(token, accountId) {
+    const { status, data } = await requester.request(
+      ENPOINT_KEY.ACCOUNTS_TRANSACTIONS,
+      {
+        config: ApiConfig.getUserAuth(token),
+        urlParam: accountId,
+      },
+    );
+
+    return { status, data };
   }
 }

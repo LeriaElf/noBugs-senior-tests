@@ -12,13 +12,19 @@ import { CUSTOMER_RESPONSE_MESSAGES } from "../utils/responseSpec.js";
 
 describe("Customer Servise tests", function () {
   let token;
+  let userId;
 
   before(async () => {
-    const { requestData } = await AdminSteps.createUser();
+    const { requestData, responseData } = await AdminSteps.createUser();
     token = await UserSteps.loginUser(
       requestData.username,
       requestData.password,
     );
+    userId = responseData.id;
+  });
+
+  after(async () => {
+    await AdminSteps.deleteUser(userId);
   });
 
   it("User shoud be able to get customer profile", async () => {
@@ -47,6 +53,9 @@ describe("Customer Servise tests", function () {
     expect(status).to.equal(HTTP_STATUS.OK);
     expect(data.message).to.equal(CUSTOMER_RESPONSE_MESSAGES.PROFILE_UPDATED);
     expect(data.customer.name).to.equal(profileName.name);
+
+    const { data: newUserData } = await UserSteps.getUserProfileData(token);
+    expect(newUserData.name).to.equal(profileName.name);
   });
 
   const validNames = [
@@ -69,6 +78,9 @@ describe("Customer Servise tests", function () {
       expect(status).to.equal(HTTP_STATUS.OK);
       expect(data.message).to.equal(CUSTOMER_RESPONSE_MESSAGES.PROFILE_UPDATED);
       expect(data.customer.name).to.equal(name);
+
+      const { data: newUserData } = await UserSteps.getUserProfileData(token);
+      expect(newUserData.name).to.equal(name);
     });
   });
 
@@ -105,6 +117,9 @@ describe("Customer Servise tests", function () {
           expectedError,
         },
       );
+
+      const { data: newUserData } = await UserSteps.getUserProfileData(token);
+      expect(newUserData.name).not.to.equal(name);
     });
   });
 });

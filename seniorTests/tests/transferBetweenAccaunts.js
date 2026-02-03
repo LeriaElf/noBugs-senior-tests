@@ -4,6 +4,7 @@ import { ENPOINT_KEY } from "../utils/enpoints.js";
 import { requester } from "../utils/requester.js";
 import { ApiConfig } from "../utils/apiConfig.js";
 import { UserSteps } from "../utils/steps/userSteps.js";
+import { AdminSteps } from "../utils/steps/adminSteps.js";
 import { errorHandlingRequester } from "../utils/errorHandlingRequester.js";
 import { AccountTransferRequest } from "../models/accountTransferRequest.js";
 import { AccountTransferResponse } from "../models/accountTransferResponse.js";
@@ -14,15 +15,23 @@ import { TRANSFER_ERRORS, KEY_ERRORS } from "../utils/responseSpec.js";
 describe("Transfer Service tests", function () {
   let token;
   let accountIds;
+  let usersId = [];
 
   before(async () => {
     const response = await UserSteps.createUserWithAccounts(3);
     token = response.token;
     accountIds = response.accountIds;
+    usersId.push(response.userId);
   });
 
   beforeEach(async () => {
     await UserSteps.depositeToAccount(token, accountIds[0], 5000);
+  });
+
+  after(async () => {
+    Promise.all(
+      usersId.map(async (userId) => await AdminSteps.deleteUser(userId)),
+    );
   });
 
   const validData = [
@@ -101,12 +110,23 @@ describe("Transfer Service tests", function () {
   });
 
   it("User should be able to transfer to someone else's account", async () => {
-    const { accountIds: newUserAccountIds } =
-      await UserSteps.createUserWithAccounts(1);
+    const {
+      token: secondToken,
+      accountIds: newUserAccountIds,
+      userId,
+    } = await UserSteps.createUserWithAccounts(1);
+    usersId.push(userId);
+
+    const { data: secondAccauntsData } =
+      await UserSteps.getCustomerAccaunts(secondToken);
+    const secondBalance = secondAccauntsData.accounts[0].balance;
+    const receiverId = newUserAccountIds[0];
 
     const { sender } = await UserSteps.getAccountWithBalance(token);
-    const receiverId = newUserAccountIds[0];
-    const initialSenderBalance = sender.balance;
+    const initialSenderBalance =
+      sender.balance > 10000
+        ? AccountTransferRequest.generateTranferData()
+        : sender.balance;
 
     const requestData = new AccountTransferRequest({
       senderAccountId: sender.id,
@@ -132,16 +152,26 @@ describe("Transfer Service tests", function () {
       (acc) => acc.id === sender.id,
     );
 
-    expect(newSenderAccount.balance).to.equal(0);
+    expect(newSenderAccount.balance).to.equal(
+      sender.balance - initialSenderBalance,
+    );
+
+    const { data: newSecondAccauntsData } =
+      await UserSteps.getCustomerAccaunts(secondToken);
+    const newSecondBalance = newSecondAccauntsData.accounts[0].balance;
+    expect(newSecondBalance).to.equal(secondBalance + initialSenderBalance);
   });
 
   it("User should not be able to transfer to a non-existent account", async () => {
-    const { accountIds: newUserAccountIds } =
+    const { accountIds: newUserAccountIds, userId } =
       await UserSteps.createUserWithAccounts(1);
+    usersId.push(userId);
+
     const nonExistentAccount = newUserAccountIds[0] + 1000;
     const sendAmount = AccountTransferRequest.generateTranferData();
 
     const { sender } = await UserSteps.getAccountWithBalance(token);
+    const initialBalance = sender.balance;
 
     const requestData = new AccountTransferRequest({
       senderAccountId: sender.id,
@@ -163,10 +193,19 @@ describe("Transfer Service tests", function () {
         expectedError,
       },
     );
+
+    const { data: newAccauntsData } =
+      await UserSteps.getCustomerAccaunts(token);
+    const newSenderAccount = newAccauntsData.accounts.find(
+      (acc) => acc.id === sender.id,
+    );
+
+    expect(newSenderAccount.balance).to.equal(initialBalance);
   });
 
   it("User should not be able to transfer to the same account", async () => {
     const { sender } = await UserSteps.getAccountWithBalance(token);
+    const initialBalance = sender.balance;
     const sendAmount = AccountTransferRequest.generateTranferData();
 
     const requestData = new AccountTransferRequest({
@@ -189,6 +228,14 @@ describe("Transfer Service tests", function () {
         expectedError,
       },
     );
+
+    const { data: newAccauntsData } =
+      await UserSteps.getCustomerAccaunts(token);
+    const newSenderAccount = newAccauntsData.accounts.find(
+      (acc) => acc.id === sender.id,
+    );
+
+    expect(newSenderAccount.balance).to.equal(initialBalance);
   });
 
   it("User should not be able to transfer more funds from their account than is available there", async () => {
@@ -244,6 +291,15 @@ describe("Transfer Service tests", function () {
       await UserSteps.depositeToAccount(token, sender.id, 5000);
       await UserSteps.depositeToAccount(token, sender.id, 5000);
 
+      const { accounts: updatedAccounts } =
+        await UserSteps.getAccountWithBalance(token);
+      const updatedSender = updatedAccounts.find((acc) => acc.id === sender.id);
+      const updatedReceiver = updatedAccounts.find(
+        (acc) => acc.id === receiverAccount.id,
+      );
+      const initialSenderBalance = updatedSender.balance;
+      const initialReceiverBalance = updatedReceiver.balance;
+
       const requestData = new AccountTransferRequest({
         senderAccountId: sender.id,
         receiverAccountId: receiverAccount.id,
@@ -264,6 +320,18 @@ describe("Transfer Service tests", function () {
           expectedError,
         },
       );
+
+      const { data: newAccauntsData } =
+        await UserSteps.getCustomerAccaunts(token);
+      const newSenderAccount = newAccauntsData.accounts.find(
+        (acc) => acc.id === sender.id,
+      );
+      const newReceiverAccount = newAccauntsData.accounts.find(
+        (acc) => acc.id === receiverAccount.id,
+      );
+
+      expect(newSenderAccount.balance).to.equal(initialSenderBalance);
+      expect(newReceiverAccount.balance).to.equal(initialReceiverBalance);
     });
   });
 });

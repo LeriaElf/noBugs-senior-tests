@@ -10,11 +10,22 @@ import { ApiConfig } from "../utils/apiConfig.js";
 import { ADMIN_ERRORS, KEY_ERRORS, ROLE } from "../utils/responseSpec.js";
 
 describe("Admin Servise tests", function () {
+  let userId;
+
+  after(async () => {
+    await AdminSteps.deleteUser(userId);
+  });
+
   it("Admin shoud be able to create new user", async () => {
     const { requestData, responseData, status } = await AdminSteps.createUser();
+    userId = responseData.id;
 
     expect(status).to.equal(HTTP_STATUS.CREATED);
     await assertThatModels(requestData, responseData).match();
+
+    const { data } = await AdminSteps.getAllUsers();
+    expect(data.users.find((user) => user.username === responseData.username))
+      .to.exist;
   });
 
   const invalidDataUsername = [
@@ -60,14 +71,21 @@ describe("Admin Servise tests", function () {
         errorMessages,
       });
 
+      const { data: usersBefore } = await AdminSteps.getAllUsers();
+      const countBefore = usersBefore.users.length;
+
       await errorHandlingRequester.requestExpectingError(
-        ENPOINT_KEY.ADMIN_USER,
+        ENPOINT_KEY.ADMIN_CREATE_USER,
         {
           data: CreateUserRequest.generateUserData({ username, role }),
           config: ApiConfig.adminAuth,
           expectedError,
         },
       );
+
+      const { data: usersAfter } = await AdminSteps.getAllUsers();
+      const countAfter = usersAfter.users.length;
+      expect(countAfter).to.equal(countBefore);
     });
   });
 
@@ -118,14 +136,21 @@ describe("Admin Servise tests", function () {
         errorMessages,
       });
 
+      const { data: usersBefore } = await AdminSteps.getAllUsers();
+      const countBefore = usersBefore.users.length;
+
       await errorHandlingRequester.requestExpectingError(
-        ENPOINT_KEY.ADMIN_USER,
+        ENPOINT_KEY.ADMIN_CREATE_USER,
         {
           data: CreateUserRequest.generateUserData({ password, role }),
           config: ApiConfig.adminAuth,
           expectedError,
         },
       );
+
+      const { data: usersAfter } = await AdminSteps.getAllUsers();
+      const countAfter = usersAfter.users.length;
+      expect(countAfter).to.equal(countBefore);
     });
   });
 });

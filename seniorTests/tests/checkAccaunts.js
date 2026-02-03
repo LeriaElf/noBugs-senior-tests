@@ -4,15 +4,20 @@ import { ENPOINT_KEY } from "../utils/enpoints.js";
 import { requester } from "../utils/requester.js";
 import { ApiConfig } from "../utils/apiConfig.js";
 import { UserSteps } from "../utils/steps/userSteps.js";
+import { AdminSteps } from "../utils/steps/adminSteps.js";
 
 describe("Account Servise tests", function () {
   let token;
-  let accountIds;
+  let userId;
 
   before(async () => {
     const response = await UserSteps.createUserWithAccounts();
     token = response.token;
-    accountIds = response.accountIds;
+    userId = response.userId;
+  });
+
+  after(async () => {
+    await AdminSteps.deleteUser(userId);
   });
 
   it("User shoud be able to see all their accounts", async () => {

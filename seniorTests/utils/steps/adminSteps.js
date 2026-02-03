@@ -7,7 +7,7 @@ export class AdminSteps {
   static async createUser() {
     const userData = CreateUserRequest.generateUserData();
 
-    const response = await requester.request(ENPOINT_KEY.ADMIN_USER, {
+    const response = await requester.request(ENPOINT_KEY.ADMIN_CREATE_USER, {
       data: userData,
       config: ApiConfig.adminAuth,
     });
@@ -17,5 +17,25 @@ export class AdminSteps {
       responseData: response.data,
       status: response.status,
     };
+  }
+
+  static async getAllUsers() {
+    const { data, status } = await requester.request(
+      ENPOINT_KEY.ADMIN_GET_ALL_USERS,
+      {
+        config: ApiConfig.adminAuth,
+      },
+    );
+
+    return { data, status };
+  }
+
+  static async deleteUser(userId) {
+    const resp = await requester.request(ENPOINT_KEY.ADMIN_DELETE_USER, {
+      config: ApiConfig.adminAuth,
+      urlParam: userId,
+    });
+
+    return resp;
   }
 }

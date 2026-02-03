@@ -8,14 +8,26 @@ class Requester {
     this.httpClient = new HttpClient();
   }
 
-  async request(endpointKey, { data = null, config = {} } = {}) {
+  checkUrl(url, urlParam) {
+    if (typeof url === "function") {
+      return url(urlParam);
+    }
+    return url;
+  }
+
+  async request(
+    endpointKey,
+    { data = null, config = {}, urlParam = null } = {},
+  ) {
     const endpoint = endpoints[endpointKey];
 
     if (!endpoint) {
       throw new Error(`Endpoint ${endpointKey} not found`);
     }
 
-    const { url, method, responseModel } = endpoint;
+    const { rawUrl, method, responseModel } = endpoint;
+    const url = this.checkUrl(rawUrl, urlParam);
+
     if (!method) {
       throw new Error(`Method not specified for endpoint ${endpointKey}`);
     }
@@ -27,8 +39,8 @@ class Requester {
     try {
       let response;
 
-      if (httpMethod === "get") {
-        response = await this.httpClient.get(url, {
+      if (httpMethod === "get" || httpMethod === "delete") {
+        response = await this.httpClient[httpMethod](url, {
           params: requestData,
           ...config,
         });
