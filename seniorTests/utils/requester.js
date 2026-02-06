@@ -1,50 +1,82 @@
-import HttpClient from './httpClient.js';
-import endpoints from './endpoints.js';
+import { HttpClient } from "./httpClient.js";
+import { endpoints } from "./enpoints.js";
+import { validateResponseSchema } from "./schemaValidator.js";
+import { stepLogger } from "./stepLogger.js";
 
-export default class Requester {
-    constructor() {
-        this.httpClient = new HttpClient();
+class Requester {
+  constructor() {
+    this.httpClient = new HttpClient();
+  }
+
+  checkUrl(url, urlParam) {
+    if (typeof url === "function") {
+      return url(urlParam);
+    }
+    return url;
+  }
+
+  async request(
+    endpointKey,
+    { data = null, config = {}, urlParam = null } = {},
+  ) {
+    const endpoint = endpoints[endpointKey];
+
+    if (!endpoint) {
+      throw new Error(`Endpoint ${endpointKey} not found`);
     }
 
-    async request(endpointKey, { data = null, config = {} } = {}) {
-        const endpoint = endpoints[endpointKey];
+    const { rawUrl, method, responseModel } = endpoint;
+    const url = this.checkUrl(rawUrl, urlParam);
 
-        if (!endpoint) {
-            throw new Error(`Endpoint "${endpointKey}" not found`);
-        }
-
-        const { url, method = 'post', responseModel } = endpoint;
-
-        const requestData = data?.toJson ? data.toJson() : data;
-        const httpMethod = method.toLowerCase();
-
-        try {
-            let response;
-
-            if (httpMethod === 'get') {
-                response = await this.httpClient.get(url, { params: requestData, ...config });
-            } else {
-                response = await this.httpClient[httpMethod](url, requestData, config);
-            }
-
-            const responseData = responseModel
-                ? this.#instantiateModel(responseModel, response.data)
-                : response.data;
-
-            return {
-                data: responseData,
-                status: response.status,
-                headers: response.headers
-            };
-        } catch (error) {
-            throw error;
-        }
+    if (!method) {
+      throw new Error(`Method not specified for endpoint ${endpointKey}`);
     }
+    const requestData = data?.toJson ? data?.toJson() : data;
+    const httpMethod = method.toLowerCase();
 
-    #instantiateModel(ModelClass, data) {
-        if (typeof ModelClass.fromJson === 'function') {
-            return ModelClass.fromJson(data);
-        }
-        return new ModelClass(data);
+    stepLogger.request(httpMethod, url, requestData);
+
+    try {
+      let response;
+
+      if (httpMethod === "get" || httpMethod === "delete") {
+        response = await this.httpClient[httpMethod](url, {
+          params: requestData,
+          ...config,
+        });
+      } else {
+        response = await this.httpClient[httpMethod](url, requestData, config);
+      }
+
+      stepLogger.response(response.status, responseModel?.name);
+
+      if (responseModel) {
+        validateResponseSchema(responseModel.name, response.data);
+      }
+
+      const responseData = responseModel
+        ? this.#instantiateModel(responseModel, response.data)
+        : response.data;
+
+      return {
+        data: responseData,
+        status: response.status,
+        headers: response.headers,
+      };
+    } catch (error) {
+      if (error.response) {
+        stepLogger.error(error.response.status, error.response.data);
+      }
+      throw error;
     }
+  }
+
+  #instantiateModel(ModelClass, data) {
+    if (typeof ModelClass.fromJson === "function") {
+      return ModelClass.fromJson(data);
+    }
+    return new ModelClass(data);
+  }
 }
+
+export const requester = new Requester();

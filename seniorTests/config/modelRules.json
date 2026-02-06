@@ -1,9 +1,14 @@
 {
   "Object": {
     "target": "Object",
-    "fields": [
-      "username",
-      "role"
-    ]
+    "fields": ["username", "role"]
+  },
+  "CreateUserRequest": {
+    "target": "CreateUserResponse",
+    "fields": ["username", "role"]
+  },
+  "AccountTransferRequest": {
+    "target": "AccountTransferResponse",
+    "fields": ["senderAccountId", "receiverAccountId", "amount"]
   }
 }

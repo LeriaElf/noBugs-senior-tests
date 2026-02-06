@@ -1,40 +1,58 @@
-import axios from 'axios';
-import dotenv from 'dotenv';
+import axios from "axios";
+import "dotenv/config";
 
-dotenv.config();
+const baseURL = process.env.BASE_URL;
 
-const backendUrl = process.env.BACKEND_URL;
-
-export default class HttpClient {
+export class HttpClient {
   constructor() {
     this.client = axios.create({
-      baseURL: backendUrl,
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
+      baseURL: baseURL,
     });
   }
 
-async get(url, config = {}) {
+  async get(url, config = {}) {
     try {
-        return await this.client.get(url, config);
+      return await this.client.get(url, config);
     } catch (error) {
-        if (error.response) {
-            throw new Error(`Request failed with status ${error.response.status}`);
-        }
-    throw error;
+      if (error.response) {
+        throw new Error(
+          `Request failed with status code ${error.response.status}`,
+        );
+      }
+      throw error;
     }
-}
+  }
 
-  async post(url, data, config = {}) {
+  async post(url, data, config) {
     try {
-        return await this.client.post(url, data, config);
+      return await this.client.post(url, data, config);
     } catch (error) {
-        throw {
-          message: `Request failed with status ${error.response.status}`,
-          response: error.response
-        };
+      throw {
+        message: `Request failed with status code ${error.response.status}`,
+        response: error.response,
+      };
+    }
+  }
+
+  async put(url, data, config) {
+    try {
+      return await this.client.put(url, data, config);
+    } catch (error) {
+      throw {
+        message: `Request failed with status code ${error.response.status}`,
+        response: error.response,
+      };
+    }
+  }
+
+  async delete(url, config) {
+    try {
+      return await this.client.delete(url, config);
+    } catch (error) {
+      throw {
+        message: `Request failed with status code ${error.response.status}`,
+        response: error.response,
+      };
     }
   }
 }

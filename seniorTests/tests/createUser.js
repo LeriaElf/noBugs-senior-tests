@@ -1,68 +1,156 @@
-import { expect } from "chai";
-import { AdminSteps } from "../utils/adminSteps.js";
 import { assertThatModels } from "../models/comparison/modelAssertions.js";
-import ApiConfig from "../utils/apiConfig.js";
-import CreateUserRequest from "../models/createUserRequest.js";
-import { ENDPOINTS_KEY } from "../utils/endpoints.js";
-import HTTP_STATUS from "../utils/httpStatus.js";
-import ErrorHandlingRequester from "../utils/errorHendlingRequester.js";
-import ExpectedError from "../models/expectedError.js";
+import { AdminSteps } from "../utils/steps/adminSteps.js";
+import { HTTP_STATUS } from "../utils/httpStatus.js";
+import { expect } from "chai";
+import { errorHandlingRequester } from "../utils/errorHandlingRequester.js";
+import { ExpectedError } from "../models/expectedError.js";
+import { ENPOINT_KEY } from "../utils/enpoints.js";
+import { CreateUserRequest } from "../models/createUserRequset.js";
+import { ApiConfig } from "../utils/apiConfig.js";
+import { ADMIN_ERRORS, KEY_ERRORS, ROLE } from "../utils/responseSpec.js";
 
-describe('Admin Service Tests', function() {
-    it('admin should be able to create a user', async () => {
-        const { requestData, responseData, status } = await AdminSteps.createUser();
-        
-        expect(status).to.equal(HTTP_STATUS.CREATED);
+describe("Admin Servise tests", function () {
+  let userId;
 
-        await assertThatModels(requestData, responseData).match();
+  after(async () => {
+    await AdminSteps.deleteUser(userId);
+  });
+
+  it("Admin shoud be able to create new user", async () => {
+    const { requestData, responseData, status } = await AdminSteps.createUser();
+    userId = responseData.id;
+
+    expect(status).to.equal(HTTP_STATUS.CREATED);
+    await assertThatModels(requestData, responseData).match();
+
+    const { data } = await AdminSteps.getAllUsers();
+    expect(data.users.find((user) => user.username === responseData.username))
+      .to.exist;
+  });
+
+  const invalidDataUsername = [
+    {
+      username: "",
+      role: ROLE.USER,
+      errorKey: KEY_ERRORS.USERNAME,
+      errorMessages: [
+        ADMIN_ERRORS.NAME_BLANK,
+        ADMIN_ERRORS.NAME_LENGTH,
+        ADMIN_ERRORS.NAME_MUST_CONTAIN,
+      ],
+    },
+    {
+      username: " ",
+      role: ROLE.USER,
+      errorKey: KEY_ERRORS.USERNAME,
+      errorMessages: [
+        ADMIN_ERRORS.NAME_BLANK,
+        ADMIN_ERRORS.NAME_LENGTH,
+        ADMIN_ERRORS.NAME_MUST_CONTAIN,
+      ],
+    },
+    {
+      username: "qw",
+      role: ROLE.USER,
+      errorKey: KEY_ERRORS.USERNAME,
+      errorMessages: [ADMIN_ERRORS.NAME_LENGTH],
+    },
+    {
+      username: "qweqweqweqweqweq",
+      role: ROLE.USER,
+      errorKey: KEY_ERRORS.USERNAME,
+      errorMessages: [ADMIN_ERRORS.NAME_LENGTH],
+    },
+  ];
+
+  invalidDataUsername.forEach(({ username, role, errorKey, errorMessages }) => {
+    it(`Admin should not be able to create new user with invalid ${errorKey} - "${username}"`, async function () {
+      const expectedError = new ExpectedError({
+        statusCode: HTTP_STATUS.BAD_REQUEST,
+        errorKey,
+        errorMessages,
+      });
+
+      const { data: usersBefore } = await AdminSteps.getAllUsers();
+      const countBefore = usersBefore.users.length;
+
+      await errorHandlingRequester.requestExpectingError(
+        ENPOINT_KEY.ADMIN_CREATE_USER,
+        {
+          data: CreateUserRequest.generateUserData({ username, role }),
+          config: ApiConfig.adminAuth,
+          expectedError,
+        },
+      );
+
+      const { data: usersAfter } = await AdminSteps.getAllUsers();
+      const countAfter = usersAfter.users.length;
+      expect(countAfter).to.equal(countBefore);
     });
-    
-    const invalidData = [
-  {
-    username: '',
-    password: 'PASsword333$$',
-    role: 'USER',
-    errorKey: 'username',
-    errorMessage: 'Username must be between 3 and 15 characters'
-  },
-  {
-    username: 'ab',
-    password: 'PASsword333$$',
-    role: 'USER',
-    errorKey: 'username',
-    errorMessage: 'Username must be between 3 and 15 characters'
-  },
-  {
-    username: 'abc$',
-    password: 'PASsword333$$',
-    role: 'USER',
-    errorKey: 'username',
-    errorMessage: 'Username must contain only letters, digits, dashes, underscores, and dots'
-  },
-  {
-    username: 'abc%',
-    password: 'PASsword333$$',
-    role: 'USER',
-    errorKey: 'username',
-    errorMessage: 'Username must contain only letters, digits, dashes, underscores, and dots'
-  }
-]
-    invalidData.forEach(({username, password, role, errorKey, errorMessage}) => {
-        it(`admin should not able to create a user with invalid username: ${username}`, async () => {
-            const errorRequest = new ErrorHandlingRequester();
+  });
 
-            const expectedError = new ExpectedError({
-                statusCode: HTTP_STATUS.BAD_REQUEST,
-                errorKey,
-                errorMessage
-            });
+  const invalidDataPassword = [
+    {
+      password: "",
+      role: ROLE.USER,
+      errorKey: KEY_ERRORS.PASSWORD,
+      errorMessages: [
+        ADMIN_ERRORS.PASSWORD_MUST_CONTAIN,
+        ADMIN_ERRORS.PASSWORD_BLANK,
+      ],
+    },
+    {
+      password: " ",
+      role: ROLE.USER,
+      errorKey: KEY_ERRORS.PASSWORD,
+      errorMessages: [
+        ADMIN_ERRORS.PASSWORD_MUST_CONTAIN,
+        ADMIN_ERRORS.PASSWORD_BLANK,
+      ],
+    },
+    {
+      password: "qweQW1!",
+      role: ROLE.USER,
+      errorKey: KEY_ERRORS.PASSWORD,
+      errorMessages: [ADMIN_ERRORS.PASSWORD_MUST_CONTAIN],
+    },
+    {
+      password: "qweqweqweqweqweq",
+      role: ROLE.USER,
+      errorKey: KEY_ERRORS.PASSWORD,
+      errorMessages: [ADMIN_ERRORS.PASSWORD_MUST_CONTAIN],
+    },
+    {
+      password: "qweQWE 123!@#",
+      role: ROLE.USER,
+      errorKey: KEY_ERRORS.PASSWORD,
+      errorMessages: [ADMIN_ERRORS.PASSWORD_MUST_CONTAIN],
+    },
+  ];
 
-            await errorRequest.requestExpectingError(ENDPOINTS_KEY.ADMIN_USER, {
-                data: new CreateUserRequest({ username, password, role }),
-                config: ApiConfig.adminAuth,
-                expectedError
-            });
-        }); 
+  invalidDataPassword.forEach(({ password, role, errorKey, errorMessages }) => {
+    it(`Admin should not be able to create new user with invalid ${errorKey} - "${password}"`, async function () {
+      const expectedError = new ExpectedError({
+        statusCode: HTTP_STATUS.BAD_REQUEST,
+        errorKey,
+        errorMessages,
+      });
+
+      const { data: usersBefore } = await AdminSteps.getAllUsers();
+      const countBefore = usersBefore.users.length;
+
+      await errorHandlingRequester.requestExpectingError(
+        ENPOINT_KEY.ADMIN_CREATE_USER,
+        {
+          data: CreateUserRequest.generateUserData({ password, role }),
+          config: ApiConfig.adminAuth,
+          expectedError,
+        },
+      );
+
+      const { data: usersAfter } = await AdminSteps.getAllUsers();
+      const countAfter = usersAfter.users.length;
+      expect(countAfter).to.equal(countBefore);
     });
+  });
 });
-
