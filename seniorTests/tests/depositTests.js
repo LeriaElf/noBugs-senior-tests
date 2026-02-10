@@ -4,7 +4,7 @@ import { HTTP_STATUS } from "../utils/httpStatus.js";
 import { ENPOINT_KEY } from "../utils/enpoints.js";
 import { requester } from "../utils/requester.js";
 import { ApiConfig } from "../utils/apiConfig.js";
-import { UserSteps } from "../utils/steps/userSteps.js";
+import { userSteps } from "../utils/fixtures.js";
 import { errorHandlingRequester } from "../utils/errorHandlingRequester.js";
 import { AccountDepositRequest } from "../models/accountDepositRequest.js";
 import { ExpectedError } from "../models/expectedError.js";
@@ -21,13 +21,15 @@ describe("Deposit Servise tests", function () {
 
   before(async () => {
     const { requestData, responseData } = await AdminSteps.createUser();
-    token = await UserSteps.loginUser(
+
+    const response = await userSteps.loginUser(
       requestData.username,
       requestData.password,
     );
+    token = response.token;
     userId = responseData.id;
 
-    const account = await UserSteps.createAccount(token);
+    const account = await userSteps.createAccount(token);
     accountId = account.accountId;
   });
 
@@ -56,7 +58,7 @@ describe("Deposit Servise tests", function () {
       );
       expect(currentTransaction.relatedAccountId).to.equal(accountId);
 
-      const { data } = await UserSteps.getTransactions(token, accountId);
+      const { data } = await userSteps.getTransactions(accountId, token);
       const foundTransaction = data.transactions.find(
         (tr) => tr.id === currentTransaction.id,
       );
@@ -68,8 +70,8 @@ describe("Deposit Servise tests", function () {
   it("User shoud not be able to deposit money to the others account", async () => {
     const balance = AccountDepositRequest.generateBalanceData();
 
-    const { data } = await UserSteps.getCustomerAccaunts(token);
-    const initialBalance = data.accounts[0].balance;
+    const { accounts } = await userSteps.getCustomerAccaunts(token);
+    const initialBalance = accounts[0].balance;
 
     const expectedError = new ExpectedError({
       statusCode: HTTP_STATUS.FORBIDDEN,
@@ -86,8 +88,9 @@ describe("Deposit Servise tests", function () {
       },
     );
 
-    const { data: newData } = await UserSteps.getCustomerAccaunts(token);
-    expect(newData.accounts[0].balance).to.equal(initialBalance);
+    const { accounts: newAccounts } =
+      await userSteps.getCustomerAccaunts(token);
+    expect(newAccounts[0].balance).to.equal(initialBalance);
   });
 
   const invalidAmount = [
@@ -104,8 +107,8 @@ describe("Deposit Servise tests", function () {
         errorMessages,
       });
 
-      const { data } = await UserSteps.getCustomerAccaunts(token);
-      const initialBalance = data.accounts[0].balance;
+      const { accounts } = await userSteps.getCustomerAccaunts(token);
+      const initialBalance = accounts[0].balance;
 
       await errorHandlingRequester.requestExpectingError(
         ENPOINT_KEY.ACCOUNTS_DEPOSIT,
@@ -116,14 +119,15 @@ describe("Deposit Servise tests", function () {
         },
       );
 
-      const { data: newBalance } = await UserSteps.getCustomerAccaunts(token);
-      expect(newBalance.accounts[0].balance).to.equal(initialBalance);
+      const { accounts: newAccounts } =
+        await userSteps.getCustomerAccaunts(token);
+      expect(newAccounts[0].balance).to.equal(initialBalance);
     });
   });
 
   it("User should not be able to deposit without amount", async () => {
-    const { data } = await UserSteps.getCustomerAccaunts(token);
-    const initialBalance = data.accounts[0].balance;
+    const { accounts } = await userSteps.getCustomerAccaunts(token);
+    const initialBalance = accounts[0].balance;
 
     const expectedError = new ExpectedError({
       statusCode: HTTP_STATUS.INTERNAL_SERVER_ERROR, // API bug: returns 500 instead of 400
@@ -140,7 +144,8 @@ describe("Deposit Servise tests", function () {
       },
     );
 
-    const { data: newData } = await UserSteps.getCustomerAccaunts(token);
-    expect(newData.accounts[0].balance).to.equal(initialBalance);
+    const { accounts: newAccounts } =
+      await userSteps.getCustomerAccaunts(token);
+    expect(newAccounts[0].balance).to.equal(initialBalance);
   });
 });

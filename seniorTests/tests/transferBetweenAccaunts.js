@@ -3,7 +3,7 @@ import { HTTP_STATUS } from "../utils/httpStatus.js";
 import { ENPOINT_KEY } from "../utils/enpoints.js";
 import { requester } from "../utils/requester.js";
 import { ApiConfig } from "../utils/apiConfig.js";
-import { UserSteps } from "../utils/steps/userSteps.js";
+import { userSteps } from "../utils/fixtures.js";
 import { AdminSteps } from "../utils/steps/adminSteps.js";
 import { errorHandlingRequester } from "../utils/errorHandlingRequester.js";
 import { AccountTransferRequest } from "../models/accountTransferRequest.js";
@@ -18,14 +18,14 @@ describe("Transfer Service tests", function () {
   let usersId = [];
 
   before(async () => {
-    const response = await UserSteps.createUserWithAccounts(3);
+    const response = await userSteps.createUserWithAccounts(3);
     token = response.token;
     accountIds = response.accountIds;
     usersId.push(response.userId);
   });
 
   beforeEach(async () => {
-    await UserSteps.depositeToAccount(token, accountIds[0], 5000);
+    await userSteps.depositeToAccount(accountIds[0], 5000, token);
   });
 
   after(async () => {
@@ -42,16 +42,16 @@ describe("Transfer Service tests", function () {
 
   validData.forEach(({ amount, extraDeposit }) => {
     it(`User should be able to transfer valid amount - ${amount} between their accounts`, async () => {
-      const { accounts, sender } = await UserSteps.getAccountWithBalance(token);
+      const { accounts, sender } = await userSteps.getAccountWithBalance(token);
       const receiverAccount = accounts.find((acc) => acc.id !== sender.id);
 
       if (extraDeposit > 0) {
-        await UserSteps.depositeToAccount(token, sender.id, 5000);
-        await UserSteps.depositeToAccount(token, sender.id, 5000);
+        await userSteps.depositeToAccount(sender.id, 5000, token);
+        await userSteps.depositeToAccount(sender.id, 5000, token);
       }
 
       const { accounts: updatedAccounts } =
-        await UserSteps.getAccountWithBalance(token);
+        await userSteps.getAccountWithBalance(token);
       const updatedSender = updatedAccounts.find((acc) => acc.id === sender.id);
       const updatedReceiver = updatedAccounts.find(
         (acc) => acc.id === receiverAccount.id,
@@ -78,13 +78,13 @@ describe("Transfer Service tests", function () {
       expect(status).to.equal(HTTP_STATUS.OK);
       await assertThatModels(requestData, responseData).match();
 
-      const { data: newAccauntsData } =
-        await UserSteps.getCustomerAccaunts(token);
+      const { accounts: newAccauntsData } =
+        await userSteps.getCustomerAccaunts(token);
 
-      const newSenderAccount = newAccauntsData.accounts.find(
+      const newSenderAccount = newAccauntsData.find(
         (acc) => acc.id === sender.id,
       );
-      const newReceiverAccount = newAccauntsData.accounts.find(
+      const newReceiverAccount = newAccauntsData.find(
         (acc) => acc.id === receiverAccount.id,
       );
 
@@ -114,15 +114,15 @@ describe("Transfer Service tests", function () {
       token: secondToken,
       accountIds: newUserAccountIds,
       userId,
-    } = await UserSteps.createUserWithAccounts(1);
+    } = await userSteps.createUserWithAccounts(1);
     usersId.push(userId);
 
-    const { data: secondAccauntsData } =
-      await UserSteps.getCustomerAccaunts(secondToken);
-    const secondBalance = secondAccauntsData.accounts[0].balance;
+    const { accounts: secondAccauntsData } =
+      await userSteps.getCustomerAccaunts(secondToken);
+    const secondBalance = secondAccauntsData[0].balance;
     const receiverId = newUserAccountIds[0];
 
-    const { sender } = await UserSteps.getAccountWithBalance(token);
+    const { sender } = await userSteps.getAccountWithBalance(token);
     const initialSenderBalance =
       sender.balance > 10000
         ? AccountTransferRequest.generateTranferData()
@@ -146,9 +146,9 @@ describe("Transfer Service tests", function () {
     expect(status).to.equal(HTTP_STATUS.OK);
     await assertThatModels(requestData, responseData).match();
 
-    const { data: newAccauntsData } =
-      await UserSteps.getCustomerAccaunts(token);
-    const newSenderAccount = newAccauntsData.accounts.find(
+    const { accounts: newAccauntsData } =
+      await userSteps.getCustomerAccaunts(token);
+    const newSenderAccount = newAccauntsData.find(
       (acc) => acc.id === sender.id,
     );
 
@@ -156,21 +156,21 @@ describe("Transfer Service tests", function () {
       sender.balance - initialSenderBalance,
     );
 
-    const { data: newSecondAccauntsData } =
-      await UserSteps.getCustomerAccaunts(secondToken);
-    const newSecondBalance = newSecondAccauntsData.accounts[0].balance;
+    const { accounts: newSecondAccauntsData } =
+      await userSteps.getCustomerAccaunts(secondToken);
+    const newSecondBalance = newSecondAccauntsData[0].balance;
     expect(newSecondBalance).to.equal(secondBalance + initialSenderBalance);
   });
 
   it("User should not be able to transfer to a non-existent account", async () => {
     const { accountIds: newUserAccountIds, userId } =
-      await UserSteps.createUserWithAccounts(1);
+      await userSteps.createUserWithAccounts(1);
     usersId.push(userId);
 
     const nonExistentAccount = newUserAccountIds[0] + 1000;
     const sendAmount = AccountTransferRequest.generateTranferData();
 
-    const { sender } = await UserSteps.getAccountWithBalance(token);
+    const { sender } = await userSteps.getAccountWithBalance(token);
     const initialBalance = sender.balance;
 
     const requestData = new AccountTransferRequest({
@@ -194,9 +194,9 @@ describe("Transfer Service tests", function () {
       },
     );
 
-    const { data: newAccauntsData } =
-      await UserSteps.getCustomerAccaunts(token);
-    const newSenderAccount = newAccauntsData.accounts.find(
+    const { accounts: newAccauntsData } =
+      await userSteps.getCustomerAccaunts(token);
+    const newSenderAccount = newAccauntsData.find(
       (acc) => acc.id === sender.id,
     );
 
@@ -204,7 +204,7 @@ describe("Transfer Service tests", function () {
   });
 
   it("User should not be able to transfer to the same account", async () => {
-    const { sender } = await UserSteps.getAccountWithBalance(token);
+    const { sender } = await userSteps.getAccountWithBalance(token);
     const initialBalance = sender.balance;
     const sendAmount = AccountTransferRequest.generateTranferData();
 
@@ -229,9 +229,9 @@ describe("Transfer Service tests", function () {
       },
     );
 
-    const { data: newAccauntsData } =
-      await UserSteps.getCustomerAccaunts(token);
-    const newSenderAccount = newAccauntsData.accounts.find(
+    const { accounts: newAccauntsData } =
+      await userSteps.getCustomerAccaunts(token);
+    const newSenderAccount = newAccauntsData.find(
       (acc) => acc.id === sender.id,
     );
 
@@ -239,7 +239,7 @@ describe("Transfer Service tests", function () {
   });
 
   it("User should not be able to transfer more funds from their account than is available there", async () => {
-    const { accounts, sender } = await UserSteps.getAccountWithBalance(token);
+    const { accounts, sender } = await userSteps.getAccountWithBalance(token);
     const initialSenderBalance = sender.balance;
 
     const receiverAccount = accounts.find((acc) => acc.id !== sender.id);
@@ -265,9 +265,9 @@ describe("Transfer Service tests", function () {
       },
     );
 
-    const { data: newAccauntsData } =
-      await UserSteps.getCustomerAccaunts(token);
-    const newSenderAccount = newAccauntsData.accounts.find(
+    const { accounts: newAccauntsData } =
+      await userSteps.getCustomerAccaunts(token);
+    const newSenderAccount = newAccauntsData.find(
       (acc) => acc.id === sender.id,
     );
     expect(newSenderAccount.balance).to.equal(initialSenderBalance);
@@ -285,14 +285,14 @@ describe("Transfer Service tests", function () {
 
   invalidData.forEach(({ amount, errorMessages }) => {
     it(`User should not be able to transfer invalid amount - ${amount}`, async () => {
-      const { accounts, sender } = await UserSteps.getAccountWithBalance(token);
+      const { accounts, sender } = await userSteps.getAccountWithBalance(token);
       const receiverAccount = accounts.find((acc) => acc.id !== sender.id);
 
-      await UserSteps.depositeToAccount(token, sender.id, 5000);
-      await UserSteps.depositeToAccount(token, sender.id, 5000);
+      await userSteps.depositeToAccount(sender.id, 5000, token);
+      await userSteps.depositeToAccount(sender.id, 5000, token);
 
       const { accounts: updatedAccounts } =
-        await UserSteps.getAccountWithBalance(token);
+        await userSteps.getAccountWithBalance(token);
       const updatedSender = updatedAccounts.find((acc) => acc.id === sender.id);
       const updatedReceiver = updatedAccounts.find(
         (acc) => acc.id === receiverAccount.id,
@@ -321,12 +321,12 @@ describe("Transfer Service tests", function () {
         },
       );
 
-      const { data: newAccauntsData } =
-        await UserSteps.getCustomerAccaunts(token);
-      const newSenderAccount = newAccauntsData.accounts.find(
+      const { accounts: newAccauntsData } =
+        await userSteps.getCustomerAccaunts(token);
+      const newSenderAccount = newAccauntsData.find(
         (acc) => acc.id === sender.id,
       );
-      const newReceiverAccount = newAccauntsData.accounts.find(
+      const newReceiverAccount = newAccauntsData.find(
         (acc) => acc.id === receiverAccount.id,
       );
 

@@ -4,17 +4,53 @@ import { ENPOINT_KEY } from "../enpoints.js";
 import { LoginUserRequest } from "../../models/loginUserRequest.js";
 import { AccountDepositRequest } from "../../models/accountDepositRequest.js";
 import { AdminSteps } from "../steps/adminSteps.js";
+import { HTTP_STATUS } from "../httpStatus.js";
+import { log } from "node:console";
 
 export class UserSteps {
-  static async loginUser(username, password) {
+  constructor({ username, password, token } = {}) {
+    this.username = username;
+    this.password = password;
+    this.token = token;
+  }
+
+  async ensureToken() {
+    if (this.token) return this.token;
+    if (!this.username || !this.password) {
+      throw new Error(
+        "UserSteps.ensure token: need username/password or a token",
+      );
+    }
+
+    const { status, token } = await this.loginUser(
+      this.username,
+      this.password,
+    );
+    if (status !== HTTP_STATUS.OK) {
+      throw new Error(`Login failed with status code ${status}`);
+    }
+
+    this.token = token;
+
+    if (!this.token) throw new Error("Auth token is missed");
+
+    return this.token;
+  }
+
+  async loginUser(username, password) {
     const response = await requester.request(ENPOINT_KEY.LOGIN, {
       data: new LoginUserRequest({ username, password }),
     });
 
-    return response.headers.authorization;
+    return {
+      status: response.status,
+      token: response.headers.authorization,
+    };
   }
 
-  static async createAccount(token) {
+  async createAccount(token) {
+    token = token ?? (await this.ensureToken());
+
     const response = await requester.request(ENPOINT_KEY.ACCOUNTS_CREATE, {
       data: null,
       config: ApiConfig.getUserAuth(token),
@@ -29,7 +65,9 @@ export class UserSteps {
     };
   }
 
-  static async depositeToAccount(token, accountId, amount = null) {
+  async depositeToAccount(accountId, amount = null, token) {
+    token = token ?? (await this.ensureToken());
+
     const balance = AccountDepositRequest.generateBalanceData();
 
     const response = await requester.request(ENPOINT_KEY.ACCOUNTS_DEPOSIT, {
@@ -47,9 +85,9 @@ export class UserSteps {
     };
   }
 
-  static async createUserWithAccounts(amountOfAccounts = 2) {
+  async createUserWithAccounts(amountOfAccounts = 2) {
     const { requestData, responseData } = await AdminSteps.createUser();
-    const token = await this.loginUser(
+    const { token } = await this.loginUser(
       requestData.username,
       requestData.password,
     );
@@ -60,26 +98,34 @@ export class UserSteps {
       const account = await this.createAccount(token);
       accountIds.push(account.accountId);
 
-      await this.depositeToAccount(token, account.accountId);
+      await this.depositeToAccount(account.accountId, null, token);
     }
 
     return { token, accountIds, userId: responseData.id };
   }
 
-  static async getCustomerAccaunts(token) {
-    return await requester.request(ENPOINT_KEY.CUSTOMER_ACCOUNTS, {
+  async getCustomerAccaunts(token) {
+    token = token ?? (await this.ensureToken());
+
+    const response = await requester.request(ENPOINT_KEY.CUSTOMER_ACCOUNTS, {
       config: ApiConfig.getUserAuth(token),
     });
+
+    return { status: response.status, accounts: response.data.accounts };
   }
 
-  static async getAccountWithBalance(token) {
-    const { data } = await this.getCustomerAccaunts(token);
-    const sender = data.accounts.find((acc) => acc.balance > 0);
+  async getAccountWithBalance(token) {
+    token = token ?? (await this.ensureToken());
 
-    return { accounts: data.accounts, sender };
+    const { accounts } = await this.getCustomerAccaunts(token);
+    const sender = accounts.find((acc) => acc.balance > 0);
+
+    return { accounts, sender };
   }
 
-  static async getUserProfileData(token) {
+  async getUserProfileData(token) {
+    token = token ?? (await this.ensureToken());
+
     const { status, data } = await requester.request(
       ENPOINT_KEY.CUSTOMER_PROFILE_GET,
       {
@@ -90,7 +136,9 @@ export class UserSteps {
     return { status, data };
   }
 
-  static async getTransactions(token, accountId) {
+  async getTransactions(accountId, token) {
+    token = token ?? (await this.ensureToken());
+
     const { status, data } = await requester.request(
       ENPOINT_KEY.ACCOUNTS_TRANSACTIONS,
       {
