@@ -27,7 +27,7 @@ export class AdminSteps {
       },
     );
 
-    return { data, status };
+    return { users: data.users, status };
   }
 
   static async deleteUser(userId) {

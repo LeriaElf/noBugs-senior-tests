@@ -4,7 +4,7 @@ import { HTTP_STATUS } from "../utils/httpStatus.js";
 import { ENPOINT_KEY } from "../utils/enpoints.js";
 import { requester } from "../utils/requester.js";
 import { ApiConfig } from "../utils/apiConfig.js";
-import { UserSteps } from "../utils/steps/userSteps.js";
+import { userSteps } from "../utils/fixtures.js";
 import { errorHandlingRequester } from "../utils/errorHandlingRequester.js";
 import { ExpectedError } from "../models/expectedError.js";
 import { PutCustomerProfileRequest } from "../models/putCustomerProfileRequest.js";
@@ -16,10 +16,11 @@ describe("Customer Servise tests", function () {
 
   before(async () => {
     const { requestData, responseData } = await AdminSteps.createUser();
-    token = await UserSteps.loginUser(
+    const response = await userSteps.loginUser(
       requestData.username,
       requestData.password,
     );
+    token = response.token;
     userId = responseData.id;
   });
 
@@ -54,7 +55,7 @@ describe("Customer Servise tests", function () {
     expect(data.message).to.equal(CUSTOMER_RESPONSE_MESSAGES.PROFILE_UPDATED);
     expect(data.customer.name).to.equal(profileName.name);
 
-    const { data: newUserData } = await UserSteps.getUserProfileData(token);
+    const { data: newUserData } = await userSteps.getUserProfileData(token);
     expect(newUserData.name).to.equal(profileName.name);
   });
 
@@ -79,7 +80,7 @@ describe("Customer Servise tests", function () {
       expect(data.message).to.equal(CUSTOMER_RESPONSE_MESSAGES.PROFILE_UPDATED);
       expect(data.customer.name).to.equal(name);
 
-      const { data: newUserData } = await UserSteps.getUserProfileData(token);
+      const { data: newUserData } = await userSteps.getUserProfileData(token);
       expect(newUserData.name).to.equal(name);
     });
   });
@@ -118,7 +119,7 @@ describe("Customer Servise tests", function () {
         },
       );
 
-      const { data: newUserData } = await UserSteps.getUserProfileData(token);
+      const { data: newUserData } = await userSteps.getUserProfileData(token);
       expect(newUserData.name).not.to.equal(name);
     });
   });

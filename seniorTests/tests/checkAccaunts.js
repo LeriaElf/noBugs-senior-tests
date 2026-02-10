@@ -3,7 +3,7 @@ import { HTTP_STATUS } from "../utils/httpStatus.js";
 import { ENPOINT_KEY } from "../utils/enpoints.js";
 import { requester } from "../utils/requester.js";
 import { ApiConfig } from "../utils/apiConfig.js";
-import { UserSteps } from "../utils/steps/userSteps.js";
+import { userSteps } from "../utils/fixtures.js";
 import { AdminSteps } from "../utils/steps/adminSteps.js";
 
 describe("Account Servise tests", function () {
@@ -11,7 +11,7 @@ describe("Account Servise tests", function () {
   let userId;
 
   before(async () => {
-    const response = await UserSteps.createUserWithAccounts();
+    const response = await userSteps.createUserWithAccounts();
     token = response.token;
     userId = response.userId;
   });

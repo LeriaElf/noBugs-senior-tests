@@ -25,7 +25,7 @@ class Requester {
       throw new Error(`Endpoint ${endpointKey} not found`);
     }
 
-    const { rawUrl, method, responseModel } = endpoint;
+    const { url: rawUrl, method, responseModel } = endpoint;
     const url = this.checkUrl(rawUrl, urlParam);
 
     if (!method) {

@@ -23,9 +23,9 @@ describe("Admin Servise tests", function () {
     expect(status).to.equal(HTTP_STATUS.CREATED);
     await assertThatModels(requestData, responseData).match();
 
-    const { data } = await AdminSteps.getAllUsers();
-    expect(data.users.find((user) => user.username === responseData.username))
-      .to.exist;
+    const { users } = await AdminSteps.getAllUsers();
+    expect(users.find((user) => user.username === responseData.username)).to
+      .exist;
   });
 
   const invalidDataUsername = [
@@ -71,8 +71,8 @@ describe("Admin Servise tests", function () {
         errorMessages,
       });
 
-      const { data: usersBefore } = await AdminSteps.getAllUsers();
-      const countBefore = usersBefore.users.length;
+      const { users: usersBefore } = await AdminSteps.getAllUsers();
+      const countBefore = usersBefore.length;
 
       await errorHandlingRequester.requestExpectingError(
         ENPOINT_KEY.ADMIN_CREATE_USER,
@@ -83,8 +83,8 @@ describe("Admin Servise tests", function () {
         },
       );
 
-      const { data: usersAfter } = await AdminSteps.getAllUsers();
-      const countAfter = usersAfter.users.length;
+      const { users: usersAfter } = await AdminSteps.getAllUsers();
+      const countAfter = usersAfter.length;
       expect(countAfter).to.equal(countBefore);
     });
   });
@@ -136,8 +136,8 @@ describe("Admin Servise tests", function () {
         errorMessages,
       });
 
-      const { data: usersBefore } = await AdminSteps.getAllUsers();
-      const countBefore = usersBefore.users.length;
+      const { users: usersBefore } = await AdminSteps.getAllUsers();
+      const countBefore = usersBefore.length;
 
       await errorHandlingRequester.requestExpectingError(
         ENPOINT_KEY.ADMIN_CREATE_USER,
@@ -148,8 +148,8 @@ describe("Admin Servise tests", function () {
         },
       );
 
-      const { data: usersAfter } = await AdminSteps.getAllUsers();
-      const countAfter = usersAfter.users.length;
+      const { users: usersAfter } = await AdminSteps.getAllUsers();
+      const countAfter = usersAfter.length;
       expect(countAfter).to.equal(countBefore);
     });
   });
