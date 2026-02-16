@@ -12,7 +12,7 @@ test.describe("Account Servise Tests", () => {
     withUserSession,
     authWithToken,
   }) => {
-    const [session] = await withUserSession(1); // ne ponyatno
+    const [session] = await withUserSession(1);
     const { steps, token } = session;
 
     await authWithToken({ token, goto: URLS.DASHBOARD });

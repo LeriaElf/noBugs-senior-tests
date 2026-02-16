@@ -23,21 +23,26 @@ export class BasePage {
     return this.page.getByRole("button");
   }
 
+  get homeButton() {
+    return this.page.getByText("🏠 Home", { exact: true });
+  }
+
   getPage(PageClass) {
     return new PageClass(this.page);
   }
 
   async checkAlertAndAccept(bankAlert, trigger) {
-    const [dialog] = await Promise.all([
-      this.page.waitForEvent("dialog"),
-      trigger(),
-    ]);
+    const dialogPromise = new Promise((resolve) => {
+      this.page.once("dialog", async (dialog) => {
+        expect(dialog.message()).toContain(bankAlert.message);
+        const text = dialog.message();
+        await dialog.accept();
+        resolve(text);
+      });
+    });
 
-    expect(dialog.message()).toContain(bankAlert.message);
-    const text = dialog.message();
-    await dialog.accept();
-
-    return text;
+    await trigger();
+    return dialogPromise;
   }
 
   async checkAlertAndExtractAndAccept(bankAlert, regex, trigger) {
@@ -47,5 +52,10 @@ export class BasePage {
     expect(match, `Alert was: "${text}"`).toBeTruthy();
 
     return match[1];
+  }
+
+  async homeButtonClick() {
+    await this.homeButton.click();
+    return this;
   }
 }
