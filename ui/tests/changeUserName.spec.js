@@ -4,6 +4,8 @@ import { ProfilePage } from "../pages/profilePage.js";
 import { BankAlert } from "../utils/bankAlert.js";
 import { URLS } from "../utils/urls.js";
 import { PutCustomerProfileRequest } from "../../seniorTests/models/putCustomerProfileRequest.js";
+import { generateInvalidName } from "../utils/generateInvalidName.js";
+import { nonameUser } from "../utils/constants.js";
 
 test.describe("Customer Servise tests", () => {
   test("User shoud be able to change profile name", async ({
@@ -15,7 +17,6 @@ test.describe("Customer Servise tests", () => {
     const { name: correctName } =
       PutCustomerProfileRequest.generateProfileName();
 
-    console.log(correctName, "corr namr");
     const { steps, userProfile } =
       await test.step("Precondition: create user, authorize", async () => {
         const [session] = await withUserSession(1);
@@ -36,8 +37,8 @@ test.describe("Customer Servise tests", () => {
       expect(await userDashboard.header.getUserUserName()).toBe(
         userProfile.username,
       );
-      expect(await userDashboard.header.getUserName()).toBe("Noname");
-      expect(userDashboard.welcomeText).toContainText("noname");
+      expect(await userDashboard.header.getUserName()).toBe(nonameUser);
+      expect(userDashboard.welcomeText).toContainText(nonameUser.toLowerCase());
 
       expect(userProfile.name).toBeNull();
 
@@ -84,7 +85,7 @@ test.describe("Customer Servise tests", () => {
     authWithToken,
   }) => {
     const userDashboard = new UserDashboard(page);
-    const incorrectName = "Name1 Surname";
+    const incorrectName = generateInvalidName();
 
     const { steps } =
       await test.step("Precondition: create user, authorize", async () => {
@@ -112,13 +113,13 @@ test.describe("Customer Servise tests", () => {
       );
 
       await profilePage.homeButtonClick();
-      expect(userDashboard.welcomeText).toContainText("noname");
+      expect(userDashboard.welcomeText).toContainText(nonameUser.toLowerCase());
 
       const { data } = await steps.getUserProfileData();
       expect(data.name).toBeNull();
 
       await page.reload();
-      expect(await userDashboard.header.getUserName()).toBe("Noname");
+      expect(await userDashboard.header.getUserName()).toBe(nonameUser);
     });
   });
 });
