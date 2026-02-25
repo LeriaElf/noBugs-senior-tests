@@ -1,6 +1,6 @@
 import { test as sessions } from "./withUserSession";
-import { HTTP_STATUS } from "../../seniorTests/utils/httpStatus.js";
-import { UserSteps } from "../../seniorTests/utils/steps/userSteps";
+import { HTTP_STATUS } from "../../api/utils/httpStatus.js";
+import { UserSteps } from "../../api/utils/steps/userSteps";
 
 async function injectTokenAndGoto(page, { token, goto = "/" }) {
   if (!token) throw new Error("Authorization header is missing");

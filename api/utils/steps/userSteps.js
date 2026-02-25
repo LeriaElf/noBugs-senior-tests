@@ -3,7 +3,7 @@ import { ApiConfig } from "../apiConfig.js";
 import { ENPOINT_KEY } from "../enpoints.js";
 import { LoginUserRequest } from "../../models/loginUserRequest.js";
 import { AccountDepositRequest } from "../../models/accountDepositRequest.js";
-import { AdminSteps } from "../steps/adminSteps.js";
+import { AdminSteps } from "./adminSteps.js";
 import { HTTP_STATUS } from "../httpStatus.js";
 import { log } from "node:console";
 

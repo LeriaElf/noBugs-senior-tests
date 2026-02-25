@@ -1,5 +1,5 @@
 import { test as sessionBase } from "../fixtures/sessionStorage";
-import { AdminSteps } from "@/seniorTests/utils/steps/adminSteps";
+import { AdminSteps } from "@/api/utils/steps/adminSteps";
 
 export const test = sessionBase.extend({
   withUserSession: [

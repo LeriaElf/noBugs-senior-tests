@@ -1,5 +1,5 @@
 import { test as base } from "@playwright/test";
-import { UserSteps } from "../../seniorTests/utils/steps/userSteps";
+import { UserSteps } from "../../api/utils/steps/userSteps";
 
 function createSessionStorage() {
   const map = new Map();
