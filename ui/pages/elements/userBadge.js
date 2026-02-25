@@ -15,7 +15,6 @@ export class UserBadge {
   }
 
   async getUsername() {
-    // const root = this.root.getByText("USER", { exact: true });
     const full = ((await this.root.innerText()) || "").trim();
     const roleText = await this.getRole();
 
