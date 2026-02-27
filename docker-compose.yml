@@ -1,0 +1,32 @@
+services:
+  backend:
+    image: nobugsme/nbank:with_validation_fix
+    ports:
+      - "4111:4111"
+    networks:
+      - nobugs-network
+
+  frontend:
+    image: nobugsme/nbank-ui:letest
+    expose:
+      - "80"
+    depends_on:
+      - backend
+    networks:
+      - nobugs-network
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - nobugs-network
+
+networks:
+  nobugs-network:
+    name: nobugs-network
