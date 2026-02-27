@@ -1,9 +1,9 @@
-import { AdminSteps } from "@/seniorTests/utils/steps/adminSteps";
+import { AdminSteps } from "@/api/utils/steps/adminSteps";
 import { test, expect } from "../fixtures/baseUi";
 import { AdminPanel } from "../pages/adminPanelPage.js";
 import { UserDashboard } from "../pages/userDashboard.js";
 import { LoginPage } from "../pages/loginPage.js";
-import { HTTP_STATUS } from "@/seniorTests/utils/httpStatus";
+import { HTTP_STATUS } from "@/api/utils/httpStatus";
 
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;

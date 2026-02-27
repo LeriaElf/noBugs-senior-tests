@@ -1,9 +1,9 @@
 import { test, expect } from "../fixtures/adminSession";
 import { AdminPanel } from "../pages/adminPanelPage.js";
 import { BankAlert } from "../utils/bankAlert.js";
-import { AdminSteps } from "@/seniorTests/utils/steps/adminSteps";
-import { CreateUserRequest } from "@/seniorTests/models/createUserRequset";
-import { assertThatModels } from "../../seniorTests/models/comparison/modelAssertions.js";
+import { AdminSteps } from "@/api/utils/steps/adminSteps";
+import { CreateUserRequest } from "@/api/models/createUserRequset";
+import { assertThatModels } from "../../api/models/comparison/modelAssertions.js";
 import { URLS } from "../utils/urls.js";
 import RandExp from "randexp";
 

@@ -1,4 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
+import "dotenv/config";
 
 export default defineConfig({
   testDir: "./ui/tests",
@@ -7,8 +8,8 @@ export default defineConfig({
   workers: undefined,
   reporter: [["list"], ["html", { outputFolder: "playwright-report" }]],
   use: {
-    headless: false,
-    baseURL: "http://localhost:3000",
+    headless: process.env.CI === "true",
+    baseURL: process.env.UI_BASE_URL || "http://localhost:3000",
     actionTimeout: 10_000,
     trace: "retain-on-failure",
     screenshot: "only-on-failure",

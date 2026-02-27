@@ -3,7 +3,16 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "test": "npm run test:api && npm run test:ui",
+    "test:api": "mocha \"api/tests/**/*.js\" --config .mocharc.cjs",
+    "test:ui": "playwright test",
+    "test:api:watch": "mocha \"src/api/tests/**/*.test.js\" --config .mocharc.cjs --watch",
+    "test:ui:headed": "playwright test --headed",
+    "test:ui:debug": "playwright test --debug",
+    "report:ui": "playwright show-report",
+    "report:api": "open mochawesome-report/api-report.html"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -16,10 +25,14 @@
     "axios": "^1.13.2",
     "chai": "^6.2.2",
     "chai-json-schema-ajv": "^5.2.4",
-    "mocha": "^11.7.5"
+    "mocha": "^11.7.5",
+    "mochawesome": "^7.1.4"
   },
   "dependencies": {
     "dotenv": "^17.2.3",
     "randexp": "^0.5.3"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }

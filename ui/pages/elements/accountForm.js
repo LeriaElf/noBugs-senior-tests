@@ -1,6 +1,6 @@
 import { expect } from "@playwright/test";
 import { AMOUNT_RE, ACCOUNT_RE } from "../../utils/patterns.js";
-import { AccountDepositRequest } from "../../../seniorTests/models/accountDepositRequest.js";
+import { AccountDepositRequest } from "../../../api/models/accountDepositRequest.js";
 
 export class AccountForm {
   constructor(page) {

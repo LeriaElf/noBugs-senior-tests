@@ -3,7 +3,7 @@ import { UserDashboard } from "../pages/userDashboard";
 import { ProfilePage } from "../pages/profilePage.js";
 import { BankAlert } from "../utils/bankAlert.js";
 import { URLS } from "../utils/urls.js";
-import { PutCustomerProfileRequest } from "../../seniorTests/models/putCustomerProfileRequest.js";
+import { PutCustomerProfileRequest } from "../../api/models/putCustomerProfileRequest.js";
 import { generateInvalidName } from "../utils/generateInvalidName.js";
 import { nonameUser } from "../utils/constants.js";
 
@@ -21,7 +21,7 @@ test.describe("Customer Servise tests", () => {
       await test.step("Precondition: create user, authorize", async () => {
         const [session] = await withUserSession(1);
 
-        /** @type {import('../../seniorTests/utils/steps/userSteps').UserSteps} */
+        /** @type {import('../../api/utils/steps/userSteps').UserSteps} */
         const { steps, token } = session;
 
         await authWithToken({ token, goto: URLS.DASHBOARD });

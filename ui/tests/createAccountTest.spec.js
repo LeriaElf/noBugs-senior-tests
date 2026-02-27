@@ -2,7 +2,7 @@ import { test, expect } from "../fixtures/baseUi";
 import { BankAlert } from "../utils/bankAlert.js";
 import { URLS } from "../utils/urls.js";
 import { UserDashboard } from "../pages/userDashboard";
-import { HTTP_STATUS } from "@/seniorTests/utils/httpStatus";
+import { HTTP_STATUS } from "@/api/utils/httpStatus";
 
 const ACCOUNT_NUMBER_RE = /Account Number:\s*([\w-]+)/;
 

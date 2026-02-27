@@ -4,7 +4,7 @@ import { loadComparisonRules, getRuleFor } from "./modelComparisonConfig.js";
 export const assertThatModels = (request, response) =>
   new ModelAssertions(request, response);
 
-const DEFAULT_CONFIG_PATH = "seniorTests/config/modelRules.json";
+const DEFAULT_CONFIG_PATH = "api/config/modelRules.json";
 
 class ModelAssertions {
   constructor(request, response) {

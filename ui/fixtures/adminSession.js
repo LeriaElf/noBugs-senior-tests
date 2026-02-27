@@ -1,5 +1,5 @@
 import { test as base } from "../fixtures/baseUi";
-import { ApiConfig } from "@/seniorTests/utils/apiConfig";
+import { ApiConfig } from "@/api/utils/apiConfig";
 
 function getAdminToken() {
   const headers = ApiConfig.adminAuth?.headers ?? {}; // зачем если там просто из енв берется?
