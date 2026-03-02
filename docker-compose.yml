@@ -7,7 +7,7 @@ services:
       - nobugs-network
 
   frontend:
-    image: nobugsme/nbank-ui:letest
+    image: nobugsme/nbank-ui:with_nginx
     expose:
       - "80"
     depends_on:
