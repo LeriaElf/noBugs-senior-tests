@@ -1,13 +1,13 @@
 services:
   backend:
-    image: nobugsme/nbank:with_validation_fix
+    image: nobugsme/nbank:preprod_version
     ports:
       - "4111:4111"
     networks:
       - nobugs-network
 
   frontend:
-    image: nobugsme/nbank-ui:with_nginx
+    image: nobugsme/nbank-ui:preprod_version
     expose:
       - "80"
     depends_on:

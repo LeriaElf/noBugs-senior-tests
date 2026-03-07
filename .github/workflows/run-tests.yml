@@ -1,0 +1,58 @@
+name: Run tests
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Start services (backend, frontend, nginx)
+        run: docker compose up -d
+
+      - name: Wait for backend to be ready
+        run: |
+          for i in $(seq 1 30); do
+            if curl -s -o /dev/null http://localhost:4111/api/v1; then
+              echo "Backend is ready"
+              break
+            fi
+            echo "Attempt $i/30, waiting 3s..."
+            sleep 3
+          done
+
+      - name: Build test image
+        run: docker build -t nobugs-tests .
+
+      - name: Run tests
+        run: |
+          mkdir -p test-output/logs test-output/api-report test-output/ui-report
+          docker run --rm \
+            --network nobugs-network \
+            -v ${{ github.workspace }}/test-output/logs:/app/logs \
+            -v ${{ github.workspace }}/test-output/api-report:/app/mochawesome-report \
+            -v ${{ github.workspace }}/test-output/ui-report:/app/playwright-report \
+            -e CI=true \
+            -e BASE_URL=http://backend:4111/api/v1 \
+            -e UI_BASE_URL=http://nginx \
+            nobugs-tests
+
+      - name: Show test log
+        if: always()
+        run: cat test-output/logs/run.log 2>/dev/null || echo "No log file"
+
+      - name: Upload test reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-reports-${{ github.run_number }}
+          path: test-output/
+          retention-days: 7
+
+      - name: Stop services
+        if: always()
+        run: docker compose down
