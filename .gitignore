@@ -7,6 +7,8 @@ midTest/
 # Playwright
 /test-results/
 /playwright-report/
+/mochawesome-report/
+/test-output/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
