@@ -61,6 +61,7 @@ jobs:
             -e CI=true \
             -e BASE_URL=http://backend:4111/api/v1 \
             -e UI_BASE_URL=http://nginx \
+            -e "ADMIN_TOKEN=Basic YWRtaW46YWRtaW4=" \
             nobugs-tests
 
       - name: Show test log
