@@ -11,6 +11,28 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Cache Docker images
+        id: cache-docker
+        uses: actions/cache@v4
+        with:
+          path: /tmp/docker-images
+          key: docker-images-${{ hashFiles('docker-compose.yml') }}
+
+      - name: Load Docker images from cache
+        if: steps.cache-docker.outputs.cache-hit == 'true'
+        run: |
+          docker load -i /tmp/docker-images/backend.tar
+          docker load -i /tmp/docker-images/frontend.tar
+
+      - name: Pull and save Docker images
+        if: steps.cache-docker.outputs.cache-hit != 'true'
+        run: |
+          docker pull nobugsme/nbank:with_validation_fix
+          docker pull nobugsme/nbank-ui:preprod_version
+          mkdir -p /tmp/docker-images
+          docker save nobugsme/nbank:with_validation_fix -o /tmp/docker-images/backend.tar
+          docker save nobugsme/nbank-ui:preprod_version -o /tmp/docker-images/frontend.tar
+
       - name: Start services (backend, frontend, nginx)
         run: docker compose up -d
 
