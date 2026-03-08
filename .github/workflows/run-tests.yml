@@ -16,13 +16,13 @@ jobs:
 
       - name: Wait for backend to be ready
         run: |
-          for i in $(seq 1 30); do
+          for i in $(seq 1 90); do
             if curl -s -o /dev/null http://localhost:4111/api/v1; then
               echo "Backend is ready"
               break
             fi
-            echo "Attempt $i/30, waiting 3s..."
-            sleep 3
+            echo "Attempt $i/90, waiting 5s..."
+            sleep 5
           done
 
       - name: Build test image
