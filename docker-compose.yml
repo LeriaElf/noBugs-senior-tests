@@ -3,6 +3,9 @@ services:
     image: nobugsme/nbank:with_validation_fix
     ports:
       - "4111:4111"
+    environment:
+      - ADMIN_USERNAME=admin
+      - ADMIN_PASSWORD=admin
     networks:
       - nobugs-network
 
