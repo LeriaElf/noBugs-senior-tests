@@ -34,4 +34,4 @@ CMD /bin/bash -c " \
         echo '>>> Running UI tests' ; \
         npx playwright test ; \
     fi ; \
-    } > /app/logs/run.log 2>&1"
+    } 2>&1 | tee /app/logs/run.log"
