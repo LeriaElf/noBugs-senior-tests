@@ -1,12 +1,12 @@
-import { BasePage } from "./basePage";
-import { expect } from "@playwright/test";
-import { URLS } from "../utils/urls.js";
-import { Header } from "./elements/header.js";
+import { BasePage } from './basePage';
+import { expect } from '@playwright/test';
+import { URLS } from '../utils/urls.js';
+import { Header } from './elements/header.js';
 
 export class UserDashboard extends BasePage {
   constructor(page) {
     super(page);
-    this.header = new Header(this.page.locator("//header"));
+    this.header = new Header(this.page.locator('//header'));
   }
 
   get url() {
@@ -14,19 +14,19 @@ export class UserDashboard extends BasePage {
   }
 
   get welcomeText() {
-    return this.page.locator("//h2");
+    return this.page.locator('//h2');
   }
 
   get createAccountButton() {
-    return this.page.getByText("➕ Create New Account", { exact: true });
+    return this.page.getByText('➕ Create New Account', { exact: true });
   }
 
   get depositMoneyButton() {
-    return this.page.getByText("💰 Deposit Money", { exact: true });
+    return this.page.getByText('💰 Deposit Money', { exact: true });
   }
 
   get makeTransferButton() {
-    return this.page.getByText("🔄 Make a Transfer", { exact: true });
+    return this.page.getByText('🔄 Make a Transfer', { exact: true });
   }
 
   async createAccount() {
@@ -45,12 +45,12 @@ export class UserDashboard extends BasePage {
   }
 
   async expectLoaded() {
-    await expect(this.page.getByText("User Dashboard")).toBeVisible();
+    await expect(this.page.getByText('User Dashboard')).toBeVisible();
     return this;
   }
 
   async getWelcomeName() {
-    const name = this.welcomeText.locator("//span");
-    return name.innerText();
+    const name = this.welcomeText.locator('//span');
+    return await name.innerText();
   }
 }

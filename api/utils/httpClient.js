@@ -1,5 +1,5 @@
-import axios from "axios";
-import "dotenv/config";
+import axios from 'axios';
+import 'dotenv/config';
 
 const baseURL = process.env.BASE_URL;
 
@@ -15,9 +15,9 @@ export class HttpClient {
       return await this.client.get(url, config);
     } catch (error) {
       if (error.response) {
-        throw new Error(
-          `Request failed with status code ${error.response.status}`,
-        );
+        throw new Error(`Request failed with status code ${error.response.status}`, {
+          cause: error,
+        });
       }
       throw error;
     }

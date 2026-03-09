@@ -1,7 +1,7 @@
-import { BasePage } from "./basePage";
-import { expect } from "@playwright/test";
-import { URLS } from "../utils/urls.js";
-import { AccountForm } from "../pages/elements/accountForm.js";
+import { BasePage } from './basePage';
+import { expect } from '@playwright/test';
+import { URLS } from '../utils/urls.js';
+import { AccountForm } from '../pages/elements/accountForm.js';
 
 export class TransferPage extends BasePage {
   constructor(page) {
@@ -18,15 +18,15 @@ export class TransferPage extends BasePage {
   }
 
   get transferAgainButton() {
-    return this.page.getByText("🔁 Transfer Again", { exact: true });
+    return this.page.getByText('🔁 Transfer Again', { exact: true });
   }
 
   get transferButton() {
-    return this.page.getByText("🚀 Send Transfer", { exact: true });
+    return this.page.getByText('🚀 Send Transfer', { exact: true });
   }
 
   get homeButton() {
-    return this.page.getByText("🏠 Home", { exact: true });
+    return this.page.getByText('🏠 Home', { exact: true });
   }
 
   async confirmCheckboxClick() {
@@ -35,7 +35,7 @@ export class TransferPage extends BasePage {
   }
 
   async checkboxIsChecked() {
-    return this.confirmCheckbox.isChecked();
+    return await this.confirmCheckbox.isChecked();
   }
 
   async clickTransferButton() {
@@ -54,9 +54,7 @@ export class TransferPage extends BasePage {
   }
 
   async titleIsVisible() {
-    await expect(
-      this.page.getByText("🔄 Make a Transfer", { exact: true }),
-    ).toBeVisible();
+    await expect(this.page.getByText('🔄 Make a Transfer', { exact: true })).toBeVisible();
 
     return this;
   }

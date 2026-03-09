@@ -1,17 +1,14 @@
-import { requester } from "./requester.js";
+import { requester } from './requester.js';
 
 class ErrorHandlingRequester {
-  async requestExpectingError(
-    endpointKey,
-    { data = null, config = {}, expectedError },
-  ) {
+  async requestExpectingError(endpointKey, { data = null, config = {}, expectedError }) {
     try {
       await requester.request(endpointKey, { data, config });
       throw new Error(
         `Expected error with status "${expectedError.statusCode}", but request succeeded with 2xx`,
       );
     } catch (error) {
-      if (error.message.includes("but request succeeded")) {
+      if (error.message.includes('but request succeeded')) {
         throw error;
       }
 
@@ -21,17 +18,14 @@ class ErrorHandlingRequester {
       if (actualStatus !== expectedError.statusCode) {
         throw new Error(
           `Expected status "${expectedError.statusCode}", but got "${actualStatus}"`,
+          { cause: error },
         );
       }
 
       const actualValue =
-        typeof responseData === "string"
-          ? responseData
-          : responseData?.[expectedError.errorKey];
+        typeof responseData === 'string' ? responseData : responseData?.[expectedError.errorKey];
 
-      const actualMessagesArray = Array.isArray(actualValue)
-        ? actualValue
-        : [actualValue];
+      const actualMessagesArray = Array.isArray(actualValue) ? actualValue : [actualValue];
 
       const expectedSorted = [...expectedError.errorMessages].sort();
       const actualSorted = [...actualMessagesArray].sort();
@@ -42,6 +36,7 @@ class ErrorHandlingRequester {
       ) {
         throw new Error(
           `Expected messages ${JSON.stringify(expectedError.errorMessages)}, but got ${JSON.stringify(actualMessagesArray)}`,
+          { cause: error },
         );
       }
 
