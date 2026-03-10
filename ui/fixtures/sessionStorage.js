@@ -54,7 +54,7 @@ function createSessionStorage() {
 
 export const test = base.extend({
   sessionStorage: [
-    async ({}, use) => {
+    async (_, use) => {
       const store = createSessionStorage();
       await use(store);
 
