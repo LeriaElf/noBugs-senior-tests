@@ -28,10 +28,10 @@ jobs:
         if: steps.cache-docker.outputs.cache-hit != 'true'
         run: |
           docker pull nobugsme/nbank:with_validation_fix
-          docker pull nobugsme/nbank-ui:preprod_version
+          docker pull nobugsme/nbank-ui:with_nginx_with_send_transfer_fix
           mkdir -p /tmp/docker-images
           docker save nobugsme/nbank:with_validation_fix -o /tmp/docker-images/backend.tar
-          docker save nobugsme/nbank-ui:preprod_version -o /tmp/docker-images/frontend.tar
+          docker save nobugsme/nbank-ui:with_nginx_with_send_transfer_fix -o /tmp/docker-images/frontend.tar
 
       - name: Start services (backend, frontend, nginx)
         run: docker compose up -d

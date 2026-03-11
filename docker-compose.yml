@@ -10,7 +10,7 @@ services:
       - nobugs-network
 
   frontend:
-    image: nobugsme/nbank-ui:preprod_version
+    image: nobugsme/nbank-ui:with_nginx_with_send_transfer_fix
     expose:
       - "80"
     depends_on:
