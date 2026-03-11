@@ -4,7 +4,14 @@ import globals from 'globals';
 
 export default [
   {
-    ignores: ['playwright-report/', 'mochawesome-report/', 'test-results/', 'test-output/'],
+    ignores: [
+      'playwright-report/',
+      'mochawesome-report/',
+      'test-results/',
+      'test-output/',
+      'allure-report/',
+      'allure-results/',
+    ],
   },
   js.configs.recommended,
   prettierConfig,
@@ -19,6 +26,7 @@ export default [
       'no-unused-vars': 'warn',
       'no-console': 'off',
       'require-await': 'error',
+      'no-empty-pattern': 'off',
     },
   },
   {
