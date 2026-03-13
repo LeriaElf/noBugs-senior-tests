@@ -110,6 +110,31 @@ jobs:
         if: always()
         run: bash ./scripts/check-coverage.sh
 
+      - name: Create redirect to latest report
+        if: always()
+        run: |
+          mkdir -p redirect
+          cat > redirect/index.html << EOF
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta http-equiv="refresh" content="0; url=./test-report/${{ github.run_number }}/allure-report/">
+            <title>Redirecting to latest report...</title>
+          </head>
+          <body>Redirecting to latest report...</body>
+          </html>
+          EOF
+
+      - name: Publish redirect index
+        uses: peaceiris/actions-gh-pages@v3
+        if: always()
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: redirect
+          destination_dir: .
+          keep_files: true
+
       - name: Publish test report
         uses: peaceiris/actions-gh-pages@v3
         if: always()
