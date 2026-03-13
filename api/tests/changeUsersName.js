@@ -28,6 +28,7 @@ describe('Customer Servise tests', function () {
   it('User shoud be able to get customer profile', async () => {
     const { status, data } = await requester.request(ENPOINT_KEY.CUSTOMER_PROFILE_GET, {
       config: ApiConfig.getUserAuth(token),
+      stepName: 'Get customer profile',
     });
 
     expect(status).to.equal(HTTP_STATUS.OK);
@@ -40,6 +41,7 @@ describe('Customer Servise tests', function () {
     const { status, data } = await requester.request(ENPOINT_KEY.CUSTOMER_PROFILE_PUT, {
       data: profileName,
       config: ApiConfig.getUserAuth(token),
+      stepName: `Update profile name to "${profileName.name}"`,
     });
 
     expect(status).to.equal(HTTP_STATUS.OK);
@@ -57,6 +59,7 @@ describe('Customer Servise tests', function () {
       const { status, data } = await requester.request(ENPOINT_KEY.CUSTOMER_PROFILE_PUT, {
         data: new PutCustomerProfileRequest({ name }),
         config: ApiConfig.getUserAuth(token),
+        stepName: `Update profile name to "${name}"`,
       });
 
       expect(status).to.equal(HTTP_STATUS.OK);

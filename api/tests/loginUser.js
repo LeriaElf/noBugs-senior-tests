@@ -22,6 +22,7 @@ describe('Auth Servise tests', function () {
 
     const { data, status, headers } = await requester.request(ENPOINT_KEY.LOGIN, {
       data: new LoginUserRequest({ username, password }),
+      stepName: `Login as user "${username}"`,
     });
 
     expect(status).to.equal(HTTP_STATUS.OK);
@@ -35,6 +36,7 @@ describe('Auth Servise tests', function () {
 
     const { status, headers } = await requester.request(ENPOINT_KEY.LOGIN, {
       data: new LoginUserRequest({ username, password }),
+      stepName: `Login as admin "${username}"`,
     });
 
     expect(status).to.equal(HTTP_STATUS.OK);

@@ -23,6 +23,7 @@ describe('Account Servise tests', function () {
   it('User shoud be able to see all their accounts', async () => {
     const { status, data } = await requester.request(ENPOINT_KEY.CUSTOMER_ACCOUNTS, {
       config: ApiConfig.getUserAuth(token),
+      stepName: 'Get all customer accounts',
     });
 
     expect(status).to.equal(HTTP_STATUS.OK);

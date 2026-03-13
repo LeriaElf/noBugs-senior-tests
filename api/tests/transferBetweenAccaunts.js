@@ -64,6 +64,7 @@ describe('Transfer Service tests', function () {
       const { status, data } = await requester.request(ENPOINT_KEY.ACCOUNTS_TRANSFER, {
         data: requestData,
         config: ApiConfig.getUserAuth(token),
+        stepName: `Transfer ${amount} from account ${sender.id} to account ${receiverAccount.id}`,
       });
       const responseData = new AccountTransferResponse(data);
 
@@ -117,6 +118,7 @@ describe('Transfer Service tests', function () {
     const { status, data } = await requester.request(ENPOINT_KEY.ACCOUNTS_TRANSFER, {
       data: requestData,
       config: ApiConfig.getUserAuth(token),
+      stepName: `Transfer ${initialSenderBalance} to external account ${receiverId}`,
     });
     const responseData = new AccountTransferResponse(data);
 

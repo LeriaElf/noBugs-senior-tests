@@ -40,6 +40,7 @@ describe('Deposit Servise tests', function () {
         {
           data: new AccountDepositRequest({ id: accountId, balance: amount }),
           config: ApiConfig.getUserAuth(token),
+          stepName: `Deposit ${amount} to account ${accountId}`,
         },
       );
 

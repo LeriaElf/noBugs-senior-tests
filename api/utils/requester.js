@@ -17,7 +17,7 @@ class Requester {
     return url;
   }
 
-  async request(endpointKey, { data = null, config = {}, urlParam = null } = {}) {
+  async request(endpointKey, { data = null, config = {}, urlParam = null, stepName = null } = {}) {
     const endpoint = endpoints[endpointKey];
 
     if (!endpoint) {
@@ -34,7 +34,9 @@ class Requester {
     const requestData = data?.toJson ? data?.toJson() : data;
     const httpMethod = method.toLowerCase();
 
-    return await step(`${httpMethod.toUpperCase()} ${url}`, async () => {
+    const stepLabel = stepName ?? `${httpMethod.toUpperCase()} ${url}`;
+
+    return await step(stepLabel, async () => {
       await stepLogger.request(httpMethod, url, requestData);
 
       try {

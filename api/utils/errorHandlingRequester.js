@@ -1,47 +1,60 @@
 import { requester } from './requester.js';
+import { endpoints } from './enpoints.js';
+import { stepLogger } from './stepLogger.js';
 
 class ErrorHandlingRequester {
   async requestExpectingError(endpointKey, { data = null, config = {}, expectedError }) {
-    try {
-      await requester.request(endpointKey, { data, config });
-      throw new Error(
-        `Expected error with status "${expectedError.statusCode}", but request succeeded with 2xx`,
-      );
-    } catch (error) {
-      if (error.message.includes('but request succeeded')) {
-        throw error;
-      }
+    const endpoint = endpoints[endpointKey];
+    const method = endpoint?.method?.toUpperCase() ?? endpointKey;
+    const url =
+      endpoint?.templateUrl ??
+      (typeof endpoint?.url === 'string' ? endpoint?.url : endpointKey);
 
-      const actualStatus = error.response?.status;
-      const responseData = error.response?.data;
+    return await stepLogger.step(
+      `Expect ${method} ${url} to fail with status ${expectedError.statusCode}`,
+      async () => {
+        try {
+          await requester.request(endpointKey, { data, config });
+          throw new Error(
+            `Expected error with status "${expectedError.statusCode}", but request succeeded with 2xx`,
+          );
+        } catch (error) {
+          if (error.message.includes('but request succeeded')) {
+            throw error;
+          }
 
-      if (actualStatus !== expectedError.statusCode) {
-        throw new Error(
-          `Expected status "${expectedError.statusCode}", but got "${actualStatus}"`,
-          { cause: error },
-        );
-      }
+          const actualStatus = error.response?.status;
+          const responseData = error.response?.data;
 
-      const actualValue =
-        typeof responseData === 'string' ? responseData : responseData?.[expectedError.errorKey];
+          if (actualStatus !== expectedError.statusCode) {
+            throw new Error(
+              `Expected status "${expectedError.statusCode}", but got "${actualStatus}"`,
+              { cause: error },
+            );
+          }
 
-      const actualMessagesArray = Array.isArray(actualValue) ? actualValue : [actualValue];
+          const actualValue =
+            typeof responseData === 'string' ? responseData : responseData?.[expectedError.errorKey];
 
-      const expectedSorted = [...expectedError.errorMessages].sort();
-      const actualSorted = [...actualMessagesArray].sort();
+          const actualMessagesArray = Array.isArray(actualValue) ? actualValue : [actualValue];
 
-      if (
-        expectedSorted.length !== actualSorted.length ||
-        !expectedSorted.every((msg, i) => msg === actualSorted[i])
-      ) {
-        throw new Error(
-          `Expected messages ${JSON.stringify(expectedError.errorMessages)}, but got ${JSON.stringify(actualMessagesArray)}`,
-          { cause: error },
-        );
-      }
+          const expectedSorted = [...expectedError.errorMessages].sort();
+          const actualSorted = [...actualMessagesArray].sort();
 
-      return;
-    }
+          if (
+            expectedSorted.length !== actualSorted.length ||
+            !expectedSorted.every((msg, i) => msg === actualSorted[i])
+          ) {
+            throw new Error(
+              `Expected messages ${JSON.stringify(expectedError.errorMessages)}, but got ${JSON.stringify(actualMessagesArray)}`,
+              { cause: error },
+            );
+          }
+
+          return;
+        }
+      },
+    );
   }
 }
 

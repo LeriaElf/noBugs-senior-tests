@@ -43,6 +43,7 @@ export class UserSteps {
         return {
           status: response.status,
           token: response.headers.authorization,
+          username: response.data.username,
         };
       },
     );
@@ -156,4 +157,5 @@ export class UserSteps {
       return { status, data };
     });
   }
+
 }
