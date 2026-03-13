@@ -1,15 +1,22 @@
 name: Run tests
 
-on:
-  push:
-  workflow_dispatch:
+on: [push, workflow_dispatch]
 
 jobs:
   run-tests:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
 
       - name: Cache Docker images
         id: cache-docker
@@ -52,29 +59,48 @@ jobs:
 
       - name: Run tests
         run: |
-          mkdir -p test-output/logs test-output/api-report test-output/ui-report
+          mkdir -p allure-results swagger-coverage/output
           docker run --rm \
             --network nobugs-network \
-            -v ${{ github.workspace }}/test-output/logs:/app/logs \
-            -v ${{ github.workspace }}/test-output/api-report:/app/mochawesome-report \
-            -v ${{ github.workspace }}/test-output/ui-report:/app/playwright-report \
+            -v ${{ github.workspace }}/allure-results:/app/allure-results \
+            -v ${{ github.workspace }}/swagger-coverage/output:/app/swagger-coverage/output \
             -e CI=true \
             -e BASE_URL=http://backend:4111/api/v1 \
             -e UI_BASE_URL=http://nginx \
             -e "ADMIN_TOKEN=Basic YWRtaW46YWRtaW4=" \
             nobugs-tests
 
-      - name: Show test log
+      - name: Run Swagger coverage
         if: always()
-        run: cat test-output/logs/run.log 2>/dev/null || echo "No log file"
+        run: ./swagger-coverage/swagger-coverage-commandline-1.5.0/bin/swagger-coverage-commandline -s http://localhost:4111/v3/api-docs -i swagger-coverage/output
 
-      - name: Upload test reports
-        uses: actions/upload-artifact@v4
+      - name: Load test report history
+        uses: actions/checkout@v4
+        if: always()
+        continue-on-error: true
+        with:
+          ref: gh-pages
+          path: gh-pages
+
+      - name: Build test report
+        uses: simple-elf/allure-report-action@v1.7
         if: always()
         with:
-          name: test-reports-${{ github.run_number }}
-          path: test-output/
-          retention-days: 7
+          gh_pages: gh-pages
+          allure_results: allure-results
+          allure_history: allure-history
+
+      - name: Build Swagger coverage report
+        if: always()
+        run: sudo cp swagger-coverage-report.html allure-history/${{ github.run_number }}
+
+      - name: Publish test report
+        uses: peaceiris/actions-gh-pages@v3
+        if: always()
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: allure-history
 
       - name: Stop services
         if: always()

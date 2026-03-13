@@ -5,13 +5,14 @@
   "main": "index.js",
   "scripts": {
     "test": "npm run test:api && npm run test:ui",
+    "pretest": "mkdir -p allure-results swagger-coverage/output",
     "test:api": "mocha \"api/tests/**/*.js\" --config .mocharc.cjs",
     "test:ui": "playwright test",
     "test:api:watch": "mocha \"src/api/tests/**/*.test.js\" --config .mocharc.cjs --watch",
     "test:ui:headed": "playwright test --headed",
     "test:ui:debug": "playwright test --debug",
-    "report:ui": "playwright show-report",
-    "report:api": "open mochawesome-report/api-report.html",
+    "allure": "allure generate allure-results --clean && allure open",
+    "coverage:swagger": "JAVA_HOME=$(/usr/libexec/java_home) ./swagger-coverage/swagger-coverage-commandline-1.5.0/bin/swagger-coverage-commandline -s http://localhost:4111/v3/api-docs -i swagger-coverage/output",
     "lint": "eslint .",
     "format": "prettier --write ."
   },
@@ -25,6 +26,10 @@
     "@playwright/test": "^1.58.1",
     "@types/node": "^25.1.0",
     "ajv": "^8.17.1",
+    "allure-commandline": "^2.32.0",
+    "allure-js-commons": "^3.0.0",
+    "allure-mocha": "^3.0.0",
+    "allure-playwright": "^3.0.0",
     "axios": "^1.13.2",
     "chai": "^6.2.2",
     "chai-json-schema-ajv": "^5.2.4",
@@ -32,7 +37,7 @@
     "eslint-config-prettier": "^10.1.8",
     "globals": "^17.4.0",
     "mocha": "^11.7.5",
-    "mochawesome": "^7.1.4",
+    "mocha-multi-reporters": "^1.5.1",
     "prettier": "^3.8.1"
   },
   "dependencies": {

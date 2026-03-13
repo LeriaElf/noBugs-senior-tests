@@ -2,6 +2,8 @@ import { HttpClient } from "./httpClient.js";
 import { endpoints } from "./enpoints.js";
 import { validateResponseSchema } from "./schemaValidator.js";
 import { stepLogger } from "./stepLogger.js";
+import { step } from "allure-js-commons";
+import { writeCoverageFile } from "./swaggerCoverageWriter.js";
 
 class Requester {
   constructor() {
@@ -25,8 +27,9 @@ class Requester {
       throw new Error(`Endpoint ${endpointKey} not found`);
     }
 
-    const { url: rawUrl, method, responseModel } = endpoint;
+    const { url: rawUrl, method, responseModel, templateUrl } = endpoint;
     const url = this.checkUrl(rawUrl, urlParam);
+    const coveragePath = templateUrl ?? url;
 
     if (!method) {
       throw new Error(`Method not specified for endpoint ${endpointKey}`);
@@ -34,41 +37,46 @@ class Requester {
     const requestData = data?.toJson ? data?.toJson() : data;
     const httpMethod = method.toLowerCase();
 
-    stepLogger.request(httpMethod, url, requestData);
+    return await step(`${httpMethod.toUpperCase()} ${url}`, async () => {
+      await stepLogger.request(httpMethod, url, requestData);
 
-    try {
-      let response;
+      try {
+        let response;
 
-      if (httpMethod === "get" || httpMethod === "delete") {
-        response = await this.httpClient[httpMethod](url, {
-          params: requestData,
-          ...config,
-        });
-      } else {
-        response = await this.httpClient[httpMethod](url, requestData, config);
+        if (httpMethod === "get" || httpMethod === "delete") {
+          response = await this.httpClient[httpMethod](url, {
+            params: requestData,
+            ...config,
+          });
+        } else {
+          response = await this.httpClient[httpMethod](url, requestData, config);
+        }
+
+        await stepLogger.response(response.status, responseModel?.name);
+
+        if (responseModel) {
+          validateResponseSchema(responseModel.name, response.data);
+        }
+
+        const responseData = responseModel
+          ? this.#instantiateModel(responseModel, response.data)
+          : response.data;
+
+        writeCoverageFile(httpMethod, coveragePath, response.status);
+
+        return {
+          data: responseData,
+          status: response.status,
+          headers: response.headers,
+        };
+      } catch (error) {
+        if (error.response) {
+          await stepLogger.error(error.response.status, error.response.data);
+          writeCoverageFile(httpMethod, coveragePath, error.response.status);
+        }
+        throw error;
       }
-
-      stepLogger.response(response.status, responseModel?.name);
-
-      if (responseModel) {
-        validateResponseSchema(responseModel.name, response.data);
-      }
-
-      const responseData = responseModel
-        ? this.#instantiateModel(responseModel, response.data)
-        : response.data;
-
-      return {
-        data: responseData,
-        status: response.status,
-        headers: response.headers,
-      };
-    } catch (error) {
-      if (error.response) {
-        stepLogger.error(error.response.status, error.response.data);
-      }
-      throw error;
-    }
+    });
   }
 
   #instantiateModel(ModelClass, data) {

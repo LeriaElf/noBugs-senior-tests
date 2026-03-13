@@ -1,3 +1,5 @@
+import { attachment } from "allure-js-commons";
+
 const COLORS = {
   reset: "\x1b[0m",
   dim: "\x1b[2m",
@@ -16,7 +18,7 @@ function colorForStatus(status) {
 }
 
 export const stepLogger = {
-  request(method, url, data) {
+  async request(method, url, data) {
     const methodStr = `${COLORS.cyan}${method.toUpperCase()}${COLORS.reset}`;
     const urlStr = `${url}`;
     let line = `${INDENT}  → ${methodStr} ${urlStr}`;
@@ -29,9 +31,14 @@ export const stepLogger = {
     }
 
     console.log(line);
+    await attachment(
+      `Request: ${method.toUpperCase()} ${url}`,
+      JSON.stringify({ method: method.toUpperCase(), url, body: data }, null, 2),
+      "application/json",
+    );
   },
 
-  response(status, modelName) {
+  async response(status, modelName) {
     const color = colorForStatus(status);
     let line = `${INDENT}  ← ${color}${status}${COLORS.reset}`;
 
@@ -40,15 +47,25 @@ export const stepLogger = {
     }
 
     console.log(line);
+    await attachment(
+      `Response: ${status}`,
+      JSON.stringify({ status, model: modelName }, null, 2),
+      "application/json",
+    );
   },
 
-  error(status, errorMessages) {
+  async error(status, errorMessages) {
     const color = colorForStatus(status);
     const msgs = Array.isArray(errorMessages)
       ? errorMessages.join("; ")
       : errorMessages;
     console.log(
       `${INDENT}  ← ${color}${status}${COLORS.reset} ${COLORS.dim}${msgs}${COLORS.reset}`,
+    );
+    await attachment(
+      `Error: ${status}`,
+      JSON.stringify({ status, messages: errorMessages }, null, 2),
+      "application/json",
     );
   },
 

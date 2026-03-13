@@ -46,6 +46,7 @@ export const endpoints = {
   },
   [ENPOINT_KEY.ADMIN_DELETE_USER]: {
     url: (userId) => `/admin/users/${userId}`,
+    templateUrl: "/admin/users/{id}",
     method: "delete",
     requestModel: BaseModel,
     responseModel: DeleteUserResponse,
@@ -76,6 +77,7 @@ export const endpoints = {
   },
   [ENPOINT_KEY.ACCOUNTS_TRANSACTIONS]: {
     url: (accountId) => `/accounts/${accountId}/transactions`,
+    templateUrl: "/accounts/{accountId}/transactions",
     method: "get",
     requestModel: GetTransactionRequest,
     responseModel: GetTransactionResponse,
