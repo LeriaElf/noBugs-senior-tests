@@ -1,9 +1,0 @@
-{
-  "method": "POST",
-  "url": "/accounts/transfer",
-  "body": {
-    "senderAccountId": 5,
-    "receiverAccountId": 8,
-    "amount": 5012
-  }
-}

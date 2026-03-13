@@ -329,10 +329,10 @@
                         <button type="button" class="btn btn-sm">GET</button>
                 </div>
                 <div class="col-4">
-                    <span>/api/v1/admin/users</span>
+                    <span>/api/v1/customer/accounts</span>
                 </div>
                 <div class="col-2">
-                    20 calls
+                    50 calls
                 </div>
                 <div class="col-4">
     <div class="row">
@@ -503,10 +503,10 @@
                         <button type="button" class="btn btn-sm">GET</button>
                 </div>
                 <div class="col-4">
-                    <span>/api/v1/customer/accounts</span>
+                    <span>/api/v1/admin/users</span>
                 </div>
                 <div class="col-2">
-                    53 calls
+                    20 calls
                 </div>
                 <div class="col-4">
     <div class="row">
@@ -664,13 +664,13 @@
                 <span class="badge badge-warning">Partial</span>
                 </div>
                 <div class="col-1">
-                        <button type="button" class="btn btn-sm">GET</button>
+                        <button type="button" class="btn btn-sm">POST</button>
                 </div>
                 <div class="col-4">
-                    <span>/api/v1/accounts/{accountId}/transactions</span>
+                    <span>/api/v1/accounts/deposit</span>
                 </div>
                 <div class="col-2">
-                    3 calls
+                    47 calls
                 </div>
                 <div class="col-4">
     <div class="row">
@@ -721,24 +721,24 @@
                     <td></td>
                 </tr>
 
-                <tr class="table-danger">
-                    <td>
-                            <span>
-                                <i class="fas fa-bug"></i>
-                            </span>
-                        &nbsp;path «accountId» is not empty
-                    </td>
-                    <td></td>
-                </tr>
-
                 <tr class="table-success">
                     <td>
                             <span>
                                 <i class="fas fa-check"></i>
                             </span>
-                        &nbsp;only declared status
+                        &nbsp;not empty body request
                     </td>
                     <td></td>
+                </tr>
+
+                <tr class="table-danger">
+                    <td>
+                            <span>
+                                <i class="fas fa-bug"></i>
+                            </span>
+                        &nbsp;only declared status
+                    </td>
+                    <td>Undeclared status: 400,500,403</td>
                 </tr>
             </tbody>
         </table>
@@ -756,13 +756,13 @@
                 <span class="badge badge-warning">Partial</span>
                 </div>
                 <div class="col-1">
-                        <button type="button" class="btn btn-sm">POST</button>
+                        <button type="button" class="btn btn-sm">GET</button>
                 </div>
                 <div class="col-4">
-                    <span>/api/v1/accounts/transfer</span>
+                    <span>/api/v1/accounts/{accountId}/transactions</span>
                 </div>
                 <div class="col-2">
-                    12 calls
+                    3 calls
                 </div>
                 <div class="col-4">
     <div class="row">
@@ -813,24 +813,24 @@
                     <td></td>
                 </tr>
 
-                <tr class="table-success">
-                    <td>
-                            <span>
-                                <i class="fas fa-check"></i>
-                            </span>
-                        &nbsp;not empty body request
-                    </td>
-                    <td></td>
-                </tr>
-
                 <tr class="table-danger">
                     <td>
                             <span>
                                 <i class="fas fa-bug"></i>
                             </span>
+                        &nbsp;path «accountId» is not empty
+                    </td>
+                    <td></td>
+                </tr>
+
+                <tr class="table-success">
+                    <td>
+                            <span>
+                                <i class="fas fa-check"></i>
+                            </span>
                         &nbsp;only declared status
                     </td>
-                    <td>Undeclared status: 400</td>
+                    <td></td>
                 </tr>
             </tbody>
         </table>
@@ -848,13 +848,13 @@
                 <span class="badge badge-warning">Partial</span>
                 </div>
                 <div class="col-1">
-                        <button type="button" class="btn btn-sm">PUT</button>
+                        <button type="button" class="btn btn-sm">DELETE</button>
                 </div>
                 <div class="col-4">
-                    <span>/api/v1/customer/profile</span>
+                    <span>/api/v1/admin/users/{id}</span>
                 </div>
                 <div class="col-2">
-                    21 calls
+                    9 calls
                 </div>
                 <div class="col-4">
     <div class="row">
@@ -905,24 +905,24 @@
                     <td></td>
                 </tr>
 
-                <tr class="table-success">
-                    <td>
-                            <span>
-                                <i class="fas fa-check"></i>
-                            </span>
-                        &nbsp;not empty body request
-                    </td>
-                    <td></td>
-                </tr>
-
                 <tr class="table-danger">
                     <td>
                             <span>
                                 <i class="fas fa-bug"></i>
                             </span>
+                        &nbsp;path «id» is not empty
+                    </td>
+                    <td></td>
+                </tr>
+
+                <tr class="table-success">
+                    <td>
+                            <span>
+                                <i class="fas fa-check"></i>
+                            </span>
                         &nbsp;only declared status
                     </td>
-                    <td>Undeclared status: 400</td>
+                    <td></td>
                 </tr>
             </tbody>
         </table>
@@ -940,13 +940,13 @@
                 <span class="badge badge-warning">Partial</span>
                 </div>
                 <div class="col-1">
-                        <button type="button" class="btn btn-sm">POST</button>
+                        <button type="button" class="btn btn-sm">PUT</button>
                 </div>
                 <div class="col-4">
-                    <span>/api/v1/accounts/deposit</span>
+                    <span>/api/v1/customer/profile</span>
                 </div>
                 <div class="col-2">
-                    48 calls
+                    21 calls
                 </div>
                 <div class="col-4">
     <div class="row">
@@ -1014,7 +1014,7 @@
                             </span>
                         &nbsp;only declared status
                     </td>
-                    <td>Undeclared status: 400,500,403</td>
+                    <td>Undeclared status: 400</td>
                 </tr>
             </tbody>
         </table>
@@ -1032,13 +1032,13 @@
                 <span class="badge badge-warning">Partial</span>
                 </div>
                 <div class="col-1">
-                        <button type="button" class="btn btn-sm">DELETE</button>
+                        <button type="button" class="btn btn-sm">POST</button>
                 </div>
                 <div class="col-4">
-                    <span>/api/v1/admin/users/{id}</span>
+                    <span>/api/v1/accounts/transfer</span>
                 </div>
                 <div class="col-2">
-                    9 calls
+                    11 calls
                 </div>
                 <div class="col-4">
     <div class="row">
@@ -1089,24 +1089,24 @@
                     <td></td>
                 </tr>
 
-                <tr class="table-danger">
-                    <td>
-                            <span>
-                                <i class="fas fa-bug"></i>
-                            </span>
-                        &nbsp;path «id» is not empty
-                    </td>
-                    <td></td>
-                </tr>
-
                 <tr class="table-success">
                     <td>
                             <span>
                                 <i class="fas fa-check"></i>
                             </span>
-                        &nbsp;only declared status
+                        &nbsp;not empty body request
                     </td>
                     <td></td>
+                </tr>
+
+                <tr class="table-danger">
+                    <td>
+                            <span>
+                                <i class="fas fa-bug"></i>
+                            </span>
+                        &nbsp;only declared status
+                    </td>
+                    <td>Undeclared status: 400</td>
                 </tr>
             </tbody>
         </table>
@@ -1305,10 +1305,10 @@
                         <button type="button" class="btn btn-sm">GET</button>
                 </div>
                 <div class="col-4">
-                    <span>/api/v1/admin/users</span>
+                    <span>/api/v1/customer/accounts</span>
                 </div>
                 <div class="col-2">
-                    20 calls
+                    50 calls
                 </div>
                 <div class="col-4">
     <div class="row">
@@ -1479,10 +1479,10 @@
                         <button type="button" class="btn btn-sm">GET</button>
                 </div>
                 <div class="col-4">
-                    <span>/api/v1/customer/accounts</span>
+                    <span>/api/v1/admin/users</span>
                 </div>
                 <div class="col-2">
-                    53 calls
+                    20 calls
                 </div>
                 <div class="col-4">
     <div class="row">
@@ -1644,13 +1644,13 @@
                 <span class="badge badge-warning">Partial</span>
                 </div>
                 <div class="col-1">
-                        <button type="button" class="btn btn-sm">GET</button>
+                        <button type="button" class="btn btn-sm">POST</button>
                 </div>
                 <div class="col-4">
-                    <span>/api/v1/accounts/{accountId}/transactions</span>
+                    <span>/api/v1/accounts/deposit</span>
                 </div>
                 <div class="col-2">
-                    3 calls
+                    47 calls
                 </div>
                 <div class="col-4">
     <div class="row">
@@ -1701,24 +1701,24 @@
                     <td></td>
                 </tr>
 
-                <tr class="table-danger">
-                    <td>
-                            <span>
-                                <i class="fas fa-bug"></i>
-                            </span>
-                        &nbsp;path «accountId» is not empty
-                    </td>
-                    <td></td>
-                </tr>
-
                 <tr class="table-success">
                     <td>
                             <span>
                                 <i class="fas fa-check"></i>
                             </span>
-                        &nbsp;only declared status
+                        &nbsp;not empty body request
                     </td>
                     <td></td>
+                </tr>
+
+                <tr class="table-danger">
+                    <td>
+                            <span>
+                                <i class="fas fa-bug"></i>
+                            </span>
+                        &nbsp;only declared status
+                    </td>
+                    <td>Undeclared status: 400,500,403</td>
                 </tr>
             </tbody>
         </table>
@@ -1736,13 +1736,13 @@
                 <span class="badge badge-warning">Partial</span>
                 </div>
                 <div class="col-1">
-                        <button type="button" class="btn btn-sm">POST</button>
+                        <button type="button" class="btn btn-sm">GET</button>
                 </div>
                 <div class="col-4">
-                    <span>/api/v1/accounts/transfer</span>
+                    <span>/api/v1/accounts/{accountId}/transactions</span>
                 </div>
                 <div class="col-2">
-                    12 calls
+                    3 calls
                 </div>
                 <div class="col-4">
     <div class="row">
@@ -1793,24 +1793,24 @@
                     <td></td>
                 </tr>
 
-                <tr class="table-success">
-                    <td>
-                            <span>
-                                <i class="fas fa-check"></i>
-                            </span>
-                        &nbsp;not empty body request
-                    </td>
-                    <td></td>
-                </tr>
-
                 <tr class="table-danger">
                     <td>
                             <span>
                                 <i class="fas fa-bug"></i>
                             </span>
+                        &nbsp;path «accountId» is not empty
+                    </td>
+                    <td></td>
+                </tr>
+
+                <tr class="table-success">
+                    <td>
+                            <span>
+                                <i class="fas fa-check"></i>
+                            </span>
                         &nbsp;only declared status
                     </td>
-                    <td>Undeclared status: 400</td>
+                    <td></td>
                 </tr>
             </tbody>
         </table>
@@ -1828,13 +1828,13 @@
                 <span class="badge badge-warning">Partial</span>
                 </div>
                 <div class="col-1">
-                        <button type="button" class="btn btn-sm">PUT</button>
+                        <button type="button" class="btn btn-sm">DELETE</button>
                 </div>
                 <div class="col-4">
-                    <span>/api/v1/customer/profile</span>
+                    <span>/api/v1/admin/users/{id}</span>
                 </div>
                 <div class="col-2">
-                    21 calls
+                    9 calls
                 </div>
                 <div class="col-4">
     <div class="row">
@@ -1885,24 +1885,24 @@
                     <td></td>
                 </tr>
 
-                <tr class="table-success">
-                    <td>
-                            <span>
-                                <i class="fas fa-check"></i>
-                            </span>
-                        &nbsp;not empty body request
-                    </td>
-                    <td></td>
-                </tr>
-
                 <tr class="table-danger">
                     <td>
                             <span>
                                 <i class="fas fa-bug"></i>
                             </span>
+                        &nbsp;path «id» is not empty
+                    </td>
+                    <td></td>
+                </tr>
+
+                <tr class="table-success">
+                    <td>
+                            <span>
+                                <i class="fas fa-check"></i>
+                            </span>
                         &nbsp;only declared status
                     </td>
-                    <td>Undeclared status: 400</td>
+                    <td></td>
                 </tr>
             </tbody>
         </table>
@@ -1920,13 +1920,13 @@
                 <span class="badge badge-warning">Partial</span>
                 </div>
                 <div class="col-1">
-                        <button type="button" class="btn btn-sm">POST</button>
+                        <button type="button" class="btn btn-sm">PUT</button>
                 </div>
                 <div class="col-4">
-                    <span>/api/v1/accounts/deposit</span>
+                    <span>/api/v1/customer/profile</span>
                 </div>
                 <div class="col-2">
-                    48 calls
+                    21 calls
                 </div>
                 <div class="col-4">
     <div class="row">
@@ -1994,7 +1994,7 @@
                             </span>
                         &nbsp;only declared status
                     </td>
-                    <td>Undeclared status: 400,500,403</td>
+                    <td>Undeclared status: 400</td>
                 </tr>
             </tbody>
         </table>
@@ -2012,13 +2012,13 @@
                 <span class="badge badge-warning">Partial</span>
                 </div>
                 <div class="col-1">
-                        <button type="button" class="btn btn-sm">DELETE</button>
+                        <button type="button" class="btn btn-sm">POST</button>
                 </div>
                 <div class="col-4">
-                    <span>/api/v1/admin/users/{id}</span>
+                    <span>/api/v1/accounts/transfer</span>
                 </div>
                 <div class="col-2">
-                    9 calls
+                    11 calls
                 </div>
                 <div class="col-4">
     <div class="row">
@@ -2069,24 +2069,24 @@
                     <td></td>
                 </tr>
 
-                <tr class="table-danger">
-                    <td>
-                            <span>
-                                <i class="fas fa-bug"></i>
-                            </span>
-                        &nbsp;path «id» is not empty
-                    </td>
-                    <td></td>
-                </tr>
-
                 <tr class="table-success">
                     <td>
                             <span>
                                 <i class="fas fa-check"></i>
                             </span>
-                        &nbsp;only declared status
+                        &nbsp;not empty body request
                     </td>
                     <td></td>
+                </tr>
+
+                <tr class="table-danger">
+                    <td>
+                            <span>
+                                <i class="fas fa-bug"></i>
+                            </span>
+                        &nbsp;only declared status
+                    </td>
+                    <td>Undeclared status: 400</td>
                 </tr>
             </tbody>
         </table>
@@ -2313,7 +2313,7 @@
                             3 operations
                         </div>
                         <div class="col-2">
-                            93 calls
+                            90 calls
                         </div>
                         <div class="col-4">
     <div class="row">
@@ -2502,7 +2502,7 @@
                     <span>/api/v1/customer/accounts</span>
                 </div>
                 <div class="col-2">
-                    53 calls
+                    50 calls
                 </div>
                 <div class="col-4">
     <div class="row">
@@ -3218,7 +3218,7 @@
                             4 operations
                         </div>
                         <div class="col-2">
-                            83 calls
+                            81 calls
                         </div>
                         <div class="col-4">
     <div class="row">
@@ -3489,7 +3489,7 @@
                     <span>/api/v1/accounts/transfer</span>
                 </div>
                 <div class="col-2">
-                    12 calls
+                    11 calls
                 </div>
                 <div class="col-4">
     <div class="row">
@@ -3581,7 +3581,7 @@
                     <span>/api/v1/accounts/deposit</span>
                 </div>
                 <div class="col-2">
-                    48 calls
+                    47 calls
                 </div>
                 <div class="col-4">
     <div class="row">
@@ -4353,10 +4353,10 @@
     <div class="row">
         <div class="col-sm">
             <div class="col-12">
-                Parsed result files: 259<br>
-                Generation time: 311 ms<br>
-                Result file create interval: 2026-03-13 12:30:39 - 2026-03-13 12:31:16<br>
-                Generation report date: 2026-03-13 12:31:22<br>
+                Parsed result files: 254<br>
+                Generation time: 264 ms<br>
+                Result file create interval: 2026-03-13 13:11:07 - 2026-03-13 13:11:44<br>
+                Generation report date: 2026-03-13 13:11:46<br>
             </div>
         </div>
     </div>
