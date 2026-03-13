@@ -1,4 +1,4 @@
-import { attachment } from 'allure-js-commons';
+import { attachment, step } from 'allure-js-commons';
 
 const COLORS = {
   reset: '\x1b[0m',
@@ -67,7 +67,8 @@ export const stepLogger = {
     );
   },
 
-  step(message) {
+  async step(message, fn) {
     console.log(`${INDENT}  ● ${message}`);
+    if (fn) return await step(message, fn);
   },
 };
