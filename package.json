@@ -11,13 +11,16 @@
     "test:ui:headed": "playwright test --headed",
     "test:ui:debug": "playwright test --debug",
     "report:ui": "playwright show-report",
-    "report:api": "open mochawesome-report/api-report.html"
+    "report:api": "open mochawesome-report/api-report.html",
+    "lint": "eslint .",
+    "format": "prettier --write ."
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@faker-js/faker": "^10.2.0",
     "@playwright/test": "^1.58.1",
     "@types/node": "^25.1.0",
@@ -25,8 +28,12 @@
     "axios": "^1.13.2",
     "chai": "^6.2.2",
     "chai-json-schema-ajv": "^5.2.4",
+    "eslint": "^10.0.3",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.4.0",
     "mocha": "^11.7.5",
-    "mochawesome": "^7.1.4"
+    "mochawesome": "^7.1.4",
+    "prettier": "^3.8.1"
   },
   "dependencies": {
     "dotenv": "^17.2.3",

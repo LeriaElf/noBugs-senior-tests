@@ -1,0 +1,6 @@
+node_modules/
+playwright-report/
+mochawesome-report/
+test-results/
+test-output/
+

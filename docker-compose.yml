@@ -3,11 +3,14 @@ services:
     image: nobugsme/nbank:with_validation_fix
     ports:
       - "4111:4111"
+    environment:
+      - ADMIN_USERNAME=admin
+      - ADMIN_PASSWORD=admin
     networks:
       - nobugs-network
 
   frontend:
-    image: nobugsme/nbank-ui:with_nginx
+    image: nobugsme/nbank-ui:with_nginx_with_send_transfer_fix
     expose:
       - "80"
     depends_on:

@@ -1,5 +1,5 @@
-import { test as base } from "@playwright/test";
-import { UserSteps } from "../../api/utils/steps/userSteps";
+import { test as base } from '@playwright/test';
+import { UserSteps } from '../../api/utils/steps/userSteps';
 
 function createSessionStorage() {
   const map = new Map();
@@ -54,12 +54,12 @@ function createSessionStorage() {
 
 export const test = base.extend({
   sessionStorage: [
-    async (_, use) => {
+    async ({}, use) => {
       const store = createSessionStorage();
       await use(store);
 
       store.clear();
     },
-    { scope: "worker" },
+    { scope: 'worker' },
   ],
 });

@@ -1,11 +1,10 @@
-import { requester } from "../requester.js";
-import { ApiConfig } from "../apiConfig.js";
-import { ENPOINT_KEY } from "../enpoints.js";
-import { LoginUserRequest } from "../../models/loginUserRequest.js";
-import { AccountDepositRequest } from "../../models/accountDepositRequest.js";
-import { AdminSteps } from "./adminSteps.js";
-import { HTTP_STATUS } from "../httpStatus.js";
-import { log } from "node:console";
+import { requester } from '../requester.js';
+import { ApiConfig } from '../apiConfig.js';
+import { ENPOINT_KEY } from '../enpoints.js';
+import { LoginUserRequest } from '../../models/loginUserRequest.js';
+import { AccountDepositRequest } from '../../models/accountDepositRequest.js';
+import { AdminSteps } from './adminSteps.js';
+import { HTTP_STATUS } from '../httpStatus.js';
 
 export class UserSteps {
   constructor({ username, password, token } = {}) {
@@ -17,22 +16,17 @@ export class UserSteps {
   async ensureToken() {
     if (this.token) return this.token;
     if (!this.username || !this.password) {
-      throw new Error(
-        "UserSteps.ensure token: need username/password or a token",
-      );
+      throw new Error('UserSteps.ensure token: need username/password or a token');
     }
 
-    const { status, token } = await this.loginUser(
-      this.username,
-      this.password,
-    );
+    const { status, token } = await this.loginUser(this.username, this.password);
     if (status !== HTTP_STATUS.OK) {
       throw new Error(`Login failed with status code ${status}`);
     }
 
     this.token = token;
 
-    if (!this.token) throw new Error("Auth token is missed");
+    if (!this.token) throw new Error('Auth token is missed');
 
     return this.token;
   }
@@ -87,10 +81,7 @@ export class UserSteps {
 
   async createUserWithAccounts(amountOfAccounts = 2) {
     const { requestData, responseData } = await AdminSteps.createUser();
-    const { token } = await this.loginUser(
-      requestData.username,
-      requestData.password,
-    );
+    const { token } = await this.loginUser(requestData.username, requestData.password);
 
     const accountIds = [];
 
@@ -118,7 +109,7 @@ export class UserSteps {
     token = token ?? (await this.ensureToken());
 
     const { accounts } = await this.getCustomerAccaunts(token);
-    const sender = accounts.find((acc) => acc.balance > 0);
+    const sender = accounts.find(acc => acc.balance > 0);
 
     return { accounts, sender };
   }
@@ -126,12 +117,9 @@ export class UserSteps {
   async getUserProfileData(token) {
     token = token ?? (await this.ensureToken());
 
-    const { status, data } = await requester.request(
-      ENPOINT_KEY.CUSTOMER_PROFILE_GET,
-      {
-        config: ApiConfig.getUserAuth(token),
-      },
-    );
+    const { status, data } = await requester.request(ENPOINT_KEY.CUSTOMER_PROFILE_GET, {
+      config: ApiConfig.getUserAuth(token),
+    });
 
     return { status, data };
   }
@@ -139,13 +127,10 @@ export class UserSteps {
   async getTransactions(accountId, token) {
     token = token ?? (await this.ensureToken());
 
-    const { status, data } = await requester.request(
-      ENPOINT_KEY.ACCOUNTS_TRANSACTIONS,
-      {
-        config: ApiConfig.getUserAuth(token),
-        urlParam: accountId,
-      },
-    );
+    const { status, data } = await requester.request(ENPOINT_KEY.ACCOUNTS_TRANSACTIONS, {
+      config: ApiConfig.getUserAuth(token),
+      urlParam: accountId,
+    });
 
     return { status, data };
   }
