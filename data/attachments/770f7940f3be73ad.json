@@ -1,9 +1,0 @@
-{
-  "method": "POST",
-  "url": "/admin/users",
-  "body": {
-    "username": "PtYsEisyNqxLBX2",
-    "password": "XVHiiwx199$&",
-    "role": "USER"
-  }
-}

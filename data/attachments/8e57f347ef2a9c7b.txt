@@ -1,2 +1,0 @@
-        → POST /admin/users (username: axFRLm5lU4WEJr, password: UPTjeum198%$, role: USER)
-        ← 201 CreateUserResponse

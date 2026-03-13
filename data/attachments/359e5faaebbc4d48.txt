@@ -1,0 +1,10 @@
+        → POST /admin/users (username: SpUutya, password: DMWzmbf745$%, role: USER)
+        ← 201 CreateUserResponse
+        → POST /auth/login (username: SpUutya, password: DMWzmbf745$%)
+        ← 200 LoginUserResponse
+        → POST /accounts
+        ← 201 CreateAccountResponse
+        → POST /accounts/deposit (id: 18, balance: 1884.84)
+        ← 200 AccountDepositResponse
+        → GET /customer/accounts
+        ← 200 CustomerAccountsResponse

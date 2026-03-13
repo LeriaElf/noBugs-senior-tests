@@ -1,6 +1,0 @@
-        → POST /admin/users (username: Wst0, password: NZFbzxc281$&, role: USER)
-        ← 201 CreateUserResponse
-        → POST /auth/login (username: Wst0, password: NZFbzxc281$&)
-        ← 200 LoginUserResponse
-        → GET /customer/accounts
-        ← 200 CustomerAccountsResponse

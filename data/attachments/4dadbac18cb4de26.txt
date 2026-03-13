@@ -1,0 +1,8 @@
+        → POST /admin/users (username: 6vgVAZ6dKmX, password: QOAizpa866%$, role: USER)
+        ← 201 CreateUserResponse
+        → POST /auth/login (username: 6vgVAZ6dKmX, password: QOAizpa866%$)
+        ← 200 LoginUserResponse
+        → POST /accounts
+        ← 201 CreateAccountResponse
+        → POST /accounts/deposit (id: 19, balance: 3761)
+        ← 200 AccountDepositResponse
