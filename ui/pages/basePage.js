@@ -1,4 +1,4 @@
-import { expect } from "@playwright/test";
+import { expect } from '@playwright/test';
 
 export class BasePage {
   constructor(page) {
@@ -12,19 +12,19 @@ export class BasePage {
   }
 
   get usernameInput() {
-    return this.page.getByPlaceholder("Username");
+    return this.page.getByPlaceholder('Username');
   }
 
   get passwordInput() {
-    return this.page.getByPlaceholder("Password");
+    return this.page.getByPlaceholder('Password');
   }
 
   get button() {
-    return this.page.getByRole("button");
+    return this.page.getByRole('button');
   }
 
   get homeButton() {
-    return this.page.getByText("🏠 Home", { exact: true });
+    return this.page.getByText('🏠 Home', { exact: true });
   }
 
   getPage(PageClass) {
@@ -32,8 +32,8 @@ export class BasePage {
   }
 
   async checkAlertAndAccept(bankAlert, trigger) {
-    const dialogPromise = new Promise((resolve) => {
-      this.page.once("dialog", async (dialog) => {
+    const dialogPromise = new Promise(resolve => {
+      this.page.once('dialog', async dialog => {
         expect(dialog.message()).toContain(bankAlert.message);
         const text = dialog.message();
         await dialog.accept();

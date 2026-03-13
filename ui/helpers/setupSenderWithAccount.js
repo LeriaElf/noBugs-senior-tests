@@ -1,7 +1,4 @@
-export async function setupSenderWithAccount(
-  { withUserSession },
-  numberOfAccounts = 1,
-) {
+export async function setupSenderWithAccount({ withUserSession }, numberOfAccounts = 1) {
   const [{ user, steps, token }] = await withUserSession(1);
 
   const accounts = [];

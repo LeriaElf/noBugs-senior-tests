@@ -1,12 +1,12 @@
-import { BasePage } from "./basePage";
-import { expect } from "@playwright/test";
-import { URLS } from "../utils/urls.js";
-import { Header } from "./elements/header.js";
+import { BasePage } from './basePage';
+import { expect } from '@playwright/test';
+import { URLS } from '../utils/urls.js';
+import { Header } from './elements/header.js';
 
 export class ProfilePage extends BasePage {
   constructor(page) {
     super(page);
-    this.header = new Header(this.page.locator("//header"));
+    this.header = new Header(this.page.locator('//header'));
   }
 
   get url() {
@@ -14,15 +14,15 @@ export class ProfilePage extends BasePage {
   }
 
   get nameInput() {
-    return this.page.getByPlaceholder("Enter new name", { exact: true });
+    return this.page.getByPlaceholder('Enter new name', { exact: true });
   }
 
   get saveButton() {
-    return this.page.getByText("💾 Save Changes", { exact: true });
+    return this.page.getByText('💾 Save Changes', { exact: true });
   }
 
   async expectLoaded() {
-    await expect(this.page.getByText("✏️ Edit Profile")).toBeVisible();
+    await expect(this.page.getByText('✏️ Edit Profile')).toBeVisible();
     return this;
   }
 

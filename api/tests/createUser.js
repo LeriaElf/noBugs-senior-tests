@@ -1,22 +1,22 @@
-import { assertThatModels } from "../models/comparison/modelAssertions.js";
-import { AdminSteps } from "../utils/steps/adminSteps.js";
-import { HTTP_STATUS } from "../utils/httpStatus.js";
-import { expect } from "chai";
-import { errorHandlingRequester } from "../utils/errorHandlingRequester.js";
-import { ExpectedError } from "../models/expectedError.js";
-import { ENPOINT_KEY } from "../utils/enpoints.js";
-import { CreateUserRequest } from "../models/createUserRequset.js";
-import { ApiConfig } from "../utils/apiConfig.js";
-import { ADMIN_ERRORS, KEY_ERRORS, ROLE } from "../utils/responseSpec.js";
+import { assertThatModels } from '../models/comparison/modelAssertions.js';
+import { AdminSteps } from '../utils/steps/adminSteps.js';
+import { HTTP_STATUS } from '../utils/httpStatus.js';
+import { expect } from 'chai';
+import { errorHandlingRequester } from '../utils/errorHandlingRequester.js';
+import { ExpectedError } from '../models/expectedError.js';
+import { ENPOINT_KEY } from '../utils/enpoints.js';
+import { CreateUserRequest } from '../models/createUserRequset.js';
+import { ApiConfig } from '../utils/apiConfig.js';
+import { ADMIN_ERRORS, KEY_ERRORS, ROLE } from '../utils/responseSpec.js';
 
-describe("Admin Servise tests", function () {
+describe('Admin Servise tests', function () {
   let userId;
 
   after(async () => {
     await AdminSteps.deleteUser(userId);
   });
 
-  it("Admin shoud be able to create new user", async () => {
+  it('Admin shoud be able to create new user', async () => {
     const { requestData, responseData, status } = await AdminSteps.createUser();
     userId = responseData.id;
 
@@ -24,13 +24,12 @@ describe("Admin Servise tests", function () {
     await assertThatModels(requestData, responseData).match();
 
     const { users } = await AdminSteps.getAllUsers();
-    expect(users.find((user) => user.username === responseData.username)).to
-      .exist;
+    expect(users.find(user => user.username === responseData.username)).to.exist;
   });
 
   const invalidDataUsername = [
     {
-      username: "",
+      username: '',
       role: ROLE.USER,
       errorKey: KEY_ERRORS.USERNAME,
       errorMessages: [
@@ -40,7 +39,7 @@ describe("Admin Servise tests", function () {
       ],
     },
     {
-      username: " ",
+      username: ' ',
       role: ROLE.USER,
       errorKey: KEY_ERRORS.USERNAME,
       errorMessages: [
@@ -50,13 +49,13 @@ describe("Admin Servise tests", function () {
       ],
     },
     {
-      username: "qw",
+      username: 'qw',
       role: ROLE.USER,
       errorKey: KEY_ERRORS.USERNAME,
       errorMessages: [ADMIN_ERRORS.NAME_LENGTH],
     },
     {
-      username: "qweqweqweqweqweq",
+      username: 'qweqweqweqweqweq',
       role: ROLE.USER,
       errorKey: KEY_ERRORS.USERNAME,
       errorMessages: [ADMIN_ERRORS.NAME_LENGTH],
@@ -74,14 +73,11 @@ describe("Admin Servise tests", function () {
       const { users: usersBefore } = await AdminSteps.getAllUsers();
       const countBefore = usersBefore.length;
 
-      await errorHandlingRequester.requestExpectingError(
-        ENPOINT_KEY.ADMIN_CREATE_USER,
-        {
-          data: CreateUserRequest.generateUserData({ username, role }),
-          config: ApiConfig.adminAuth,
-          expectedError,
-        },
-      );
+      await errorHandlingRequester.requestExpectingError(ENPOINT_KEY.ADMIN_CREATE_USER, {
+        data: CreateUserRequest.generateUserData({ username, role }),
+        config: ApiConfig.adminAuth,
+        expectedError,
+      });
 
       const { users: usersAfter } = await AdminSteps.getAllUsers();
       const countAfter = usersAfter.length;
@@ -91,37 +87,31 @@ describe("Admin Servise tests", function () {
 
   const invalidDataPassword = [
     {
-      password: "",
+      password: '',
       role: ROLE.USER,
       errorKey: KEY_ERRORS.PASSWORD,
-      errorMessages: [
-        ADMIN_ERRORS.PASSWORD_MUST_CONTAIN,
-        ADMIN_ERRORS.PASSWORD_BLANK,
-      ],
+      errorMessages: [ADMIN_ERRORS.PASSWORD_MUST_CONTAIN, ADMIN_ERRORS.PASSWORD_BLANK],
     },
     {
-      password: " ",
+      password: ' ',
       role: ROLE.USER,
       errorKey: KEY_ERRORS.PASSWORD,
-      errorMessages: [
-        ADMIN_ERRORS.PASSWORD_MUST_CONTAIN,
-        ADMIN_ERRORS.PASSWORD_BLANK,
-      ],
+      errorMessages: [ADMIN_ERRORS.PASSWORD_MUST_CONTAIN, ADMIN_ERRORS.PASSWORD_BLANK],
     },
     {
-      password: "qweQW1!",
+      password: 'qweQW1!',
       role: ROLE.USER,
       errorKey: KEY_ERRORS.PASSWORD,
       errorMessages: [ADMIN_ERRORS.PASSWORD_MUST_CONTAIN],
     },
     {
-      password: "qweqweqweqweqweq",
+      password: 'qweqweqweqweqweq',
       role: ROLE.USER,
       errorKey: KEY_ERRORS.PASSWORD,
       errorMessages: [ADMIN_ERRORS.PASSWORD_MUST_CONTAIN],
     },
     {
-      password: "qweQWE 123!@#",
+      password: 'qweQWE 123!@#',
       role: ROLE.USER,
       errorKey: KEY_ERRORS.PASSWORD,
       errorMessages: [ADMIN_ERRORS.PASSWORD_MUST_CONTAIN],
@@ -139,14 +129,11 @@ describe("Admin Servise tests", function () {
       const { users: usersBefore } = await AdminSteps.getAllUsers();
       const countBefore = usersBefore.length;
 
-      await errorHandlingRequester.requestExpectingError(
-        ENPOINT_KEY.ADMIN_CREATE_USER,
-        {
-          data: CreateUserRequest.generateUserData({ password, role }),
-          config: ApiConfig.adminAuth,
-          expectedError,
-        },
-      );
+      await errorHandlingRequester.requestExpectingError(ENPOINT_KEY.ADMIN_CREATE_USER, {
+        data: CreateUserRequest.generateUserData({ password, role }),
+        config: ApiConfig.adminAuth,
+        expectedError,
+      });
 
       const { users: usersAfter } = await AdminSteps.getAllUsers();
       const countAfter = usersAfter.length;

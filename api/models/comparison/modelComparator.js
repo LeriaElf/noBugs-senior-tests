@@ -24,7 +24,7 @@ export const compareModels = (request, response, fieldMap) => {
 };
 
 const getNestedField = (obj, path) => {
-  return path.split(".").reduce((acc, key) => {
+  return path.split('.').reduce((acc, key) => {
     return acc?.[key];
   }, obj);
 };

@@ -1,4 +1,4 @@
-import { BaseModel } from "./baseModel.js";
+import { BaseModel } from './baseModel.js';
 
 export class CreateAccountResponse extends BaseModel {
   constructor({ id, accountNumber, balance, transactions = [] }) {

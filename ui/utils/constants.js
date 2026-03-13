@@ -1,1 +1,1 @@
-export const nonameUser = "Noname";
+export const nonameUser = 'Noname';

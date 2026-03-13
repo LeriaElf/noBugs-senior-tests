@@ -1,13 +1,13 @@
-import { test, expect } from "../fixtures/baseUi";
-import { BankAlert } from "../utils/bankAlert.js";
-import { URLS } from "../utils/urls.js";
-import { UserDashboard } from "../pages/userDashboard";
-import { HTTP_STATUS } from "@/api/utils/httpStatus";
+import { test, expect } from '../fixtures/baseUi';
+import { BankAlert } from '../utils/bankAlert.js';
+import { URLS } from '../utils/urls.js';
+import { UserDashboard } from '../pages/userDashboard';
+import { HTTP_STATUS } from '@/api/utils/httpStatus';
 
 const ACCOUNT_NUMBER_RE = /Account Number:\s*([\w-]+)/;
 
-test.describe("Account Servise Tests", () => {
-  test("User should be able to create new account", async ({
+test.describe('Account Servise Tests', () => {
+  test('User should be able to create new account', async ({
     page,
     withUserSession,
     authWithToken,
@@ -32,7 +32,7 @@ test.describe("Account Servise Tests", () => {
     expect(accStatus).toBe(HTTP_STATUS.OK);
     expect(Array.isArray(accounts)).toBe(true);
 
-    const created = accounts.find((acc) => acc.accountNumber === accountNumber);
+    const created = accounts.find(acc => acc.accountNumber === accountNumber);
     expect(created).toBeTruthy();
     expect(created.balance).toBe(0);
   });

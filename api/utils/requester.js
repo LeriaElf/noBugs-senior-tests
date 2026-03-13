@@ -1,9 +1,9 @@
-import { HttpClient } from "./httpClient.js";
-import { endpoints } from "./enpoints.js";
-import { validateResponseSchema } from "./schemaValidator.js";
-import { stepLogger } from "./stepLogger.js";
-import { step } from "allure-js-commons";
-import { writeCoverageFile } from "./swaggerCoverageWriter.js";
+import { HttpClient } from './httpClient.js';
+import { endpoints } from './enpoints.js';
+import { validateResponseSchema } from './schemaValidator.js';
+import { stepLogger } from './stepLogger.js';
+import { step } from 'allure-js-commons';
+import { writeCoverageFile } from './swaggerCoverageWriter.js';
 
 class Requester {
   constructor() {
@@ -11,16 +11,13 @@ class Requester {
   }
 
   checkUrl(url, urlParam) {
-    if (typeof url === "function") {
+    if (typeof url === 'function') {
       return url(urlParam);
     }
     return url;
   }
 
-  async request(
-    endpointKey,
-    { data = null, config = {}, urlParam = null } = {},
-  ) {
+  async request(endpointKey, { data = null, config = {}, urlParam = null } = {}) {
     const endpoint = endpoints[endpointKey];
 
     if (!endpoint) {
@@ -43,7 +40,7 @@ class Requester {
       try {
         let response;
 
-        if (httpMethod === "get" || httpMethod === "delete") {
+        if (httpMethod === 'get' || httpMethod === 'delete') {
           response = await this.httpClient[httpMethod](url, {
             params: requestData,
             ...config,
@@ -80,7 +77,7 @@ class Requester {
   }
 
   #instantiateModel(ModelClass, data) {
-    if (typeof ModelClass.fromJson === "function") {
+    if (typeof ModelClass.fromJson === 'function') {
       return ModelClass.fromJson(data);
     }
     return new ModelClass(data);

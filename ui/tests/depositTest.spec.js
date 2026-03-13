@@ -1,12 +1,12 @@
-import { test, expect } from "../fixtures/baseUi";
-import { UserDashboard } from "../pages/userDashboard";
-import { DepositPage } from "../pages/depositPage.js";
-import { BankAlert } from "../utils/bankAlert.js";
-import { URLS } from "../utils/urls.js";
-import { parseAlertAmount, parseAlertAccount } from "../utils/patterns.js";
-import { setupSenderWithAccount } from "../helpers/setupSenderWithAccount.js";
+import { test, expect } from '../fixtures/baseUi';
+import { UserDashboard } from '../pages/userDashboard';
+import { DepositPage } from '../pages/depositPage.js';
+import { BankAlert } from '../utils/bankAlert.js';
+import { URLS } from '../utils/urls.js';
+import { parseAlertAmount, parseAlertAccount } from '../utils/patterns.js';
+import { setupSenderWithAccount } from '../helpers/setupSenderWithAccount.js';
 
-test.describe("Deposit Servise Tests", () => {
+test.describe('Deposit Servise Tests', () => {
   test("User shoud be able to deposit valid amount into the users's account", async ({
     page,
     withUserSession,
@@ -15,7 +15,7 @@ test.describe("Deposit Servise Tests", () => {
     const userDashboard = new UserDashboard(page);
 
     const { steps, account } =
-      await test.step("Precondition: create user, authorize, create account", async () => {
+      await test.step('Precondition: create user, authorize, create account', async () => {
         const {
           steps,
           token,
@@ -46,14 +46,12 @@ test.describe("Deposit Servise Tests", () => {
       expect(parseAlertAccount(alertMessage)).toBe(account.accountNumber);
 
       const { accounts } = await steps.getCustomerAccaunts();
-      const userAccount = accounts.find(
-        (acc) => acc.accountNumber === account.accountNumber,
-      );
+      const userAccount = accounts.find(acc => acc.accountNumber === account.accountNumber);
       expect(userAccount.balance).toBe(account.balance + amount);
     });
   });
 
-  test("User should not be able to deposit without choosing account or amount", async ({
+  test('User should not be able to deposit without choosing account or amount', async ({
     page,
     withUserSession,
     authWithToken,
@@ -61,7 +59,7 @@ test.describe("Deposit Servise Tests", () => {
     const userDashboard = new UserDashboard(page);
 
     const { account } =
-      await test.step("Precondition: create user, authorize, create account", async () => {
+      await test.step('Precondition: create user, authorize, create account', async () => {
         const {
           token,
           accounts: [account],
@@ -75,28 +73,26 @@ test.describe("Deposit Servise Tests", () => {
         return { account };
       });
 
-    await test.step("Deposit money without choosing account, amount", async () => {
+    await test.step('Deposit money without choosing account, amount', async () => {
       await userDashboard.clickDepositMoneyButton();
 
       const depositMoneyPage = new DepositPage(page);
       await depositMoneyPage.accountForm.enterAmount();
 
-      await depositMoneyPage.checkAlertAndAccept(
-        BankAlert.DEPOSIT_SELECT_ACC,
-        () => depositMoneyPage.clickDepositButton(),
+      await depositMoneyPage.checkAlertAndAccept(BankAlert.DEPOSIT_SELECT_ACC, () =>
+        depositMoneyPage.clickDepositButton(),
       );
 
       await depositMoneyPage.accountForm.chooseAccount(account.accountNumber);
       await depositMoneyPage.accountForm.clearAmount();
 
-      await depositMoneyPage.checkAlertAndAccept(
-        BankAlert.DEPOSIT_VALID_AMOUNT,
-        () => depositMoneyPage.clickDepositButton(),
+      await depositMoneyPage.checkAlertAndAccept(BankAlert.DEPOSIT_VALID_AMOUNT, () =>
+        depositMoneyPage.clickDepositButton(),
       );
     });
   });
 
-  test("User should not be able to deposit invalid amount", async ({
+  test('User should not be able to deposit invalid amount', async ({
     page,
     withUserSession,
     authWithToken,
@@ -104,7 +100,7 @@ test.describe("Deposit Servise Tests", () => {
     const userDashboard = new UserDashboard(page);
 
     const { steps, account } =
-      await test.step("Precondition: create user, authorize, create account", async () => {
+      await test.step('Precondition: create user, authorize, create account', async () => {
         const {
           steps,
           token,
@@ -119,24 +115,21 @@ test.describe("Deposit Servise Tests", () => {
         return { steps, account };
       });
 
-    await test.step("Deposit invalid amount", async () => {
+    await test.step('Deposit invalid amount', async () => {
       await userDashboard.clickDepositMoneyButton();
 
       const depositMoneyPage = new DepositPage(page);
       await depositMoneyPage.accountForm.chooseAccount(account.accountNumber);
-      await depositMoneyPage.accountForm.enterAmount("-100");
+      await depositMoneyPage.accountForm.enterAmount('-100');
 
-      await depositMoneyPage.checkAlertAndAccept(
-        BankAlert.DEPOSIT_VALID_AMOUNT,
-        () => depositMoneyPage.clickDepositButton(),
+      await depositMoneyPage.checkAlertAndAccept(BankAlert.DEPOSIT_VALID_AMOUNT, () =>
+        depositMoneyPage.clickDepositButton(),
       );
 
       await depositMoneyPage.titleIsVisible();
 
       const { accounts } = await steps.getCustomerAccaunts();
-      const userAccount = accounts.find(
-        (acc) => acc.accountNumber === account.accountNumber,
-      );
+      const userAccount = accounts.find(acc => acc.accountNumber === account.accountNumber);
       expect(userAccount.balance).toBe(account.balance);
     });
   });
