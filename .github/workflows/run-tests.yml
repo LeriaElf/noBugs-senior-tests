@@ -100,7 +100,7 @@ jobs:
         if: always()
         run: |
           mkdir -p allure-report/swagger-coverage
-          cp swagger-coverage-report.html allure-report/swagger-coverage/ 2>/dev/null || true
+          cp swagger-coverage-report.html allure-report/swagger-coverage/index.html 2>/dev/null || true
           cp swagger-coverage-results.json allure-report/swagger-coverage/ 2>/dev/null || true
 
       - name: Publish test report

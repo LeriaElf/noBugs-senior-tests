@@ -59,7 +59,7 @@ class Requester {
           ? this.#instantiateModel(responseModel, response.data)
           : response.data;
 
-        writeCoverageFile(httpMethod, coveragePath, response.status);
+        writeCoverageFile(httpMethod, coveragePath, response.status, requestData);
 
         return {
           data: responseData,
@@ -69,7 +69,7 @@ class Requester {
       } catch (error) {
         if (error.response) {
           await stepLogger.error(error.response.status, error.response.data);
-          writeCoverageFile(httpMethod, coveragePath, error.response.status);
+          writeCoverageFile(httpMethod, coveragePath, error.response.status, requestData);
         }
         throw error;
       }
