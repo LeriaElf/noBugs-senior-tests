@@ -1,0 +1,8 @@
+{
+  "method": "POST",
+  "url": "/auth/login",
+  "body": {
+    "username": "hOSL9VXwosNw5Zv",
+    "password": "VNCwwjs551$&"
+  }
+}

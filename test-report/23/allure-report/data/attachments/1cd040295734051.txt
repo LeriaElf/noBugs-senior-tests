@@ -1,0 +1,3 @@
+        ● Create user with username "98LKN1rBJZID" and password "PCBgndw012&%"
+        → POST /admin/users (username: 98LKN1rBJZID, password: PCBgndw012&%, role: USER)
+        ← 201 CreateUserResponse
