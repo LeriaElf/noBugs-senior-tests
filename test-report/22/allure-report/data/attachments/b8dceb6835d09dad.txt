@@ -1,0 +1,12 @@
+        ● Create user with username "DgTP" and password "BPXdrrr641%%"
+        → POST /admin/users (username: DgTP, password: BPXdrrr641%%, role: USER)
+        ← 201 CreateUserResponse
+        ● Login user with username "DgTP" and password "BPXdrrr641%%"
+        → POST /auth/login (username: DgTP, password: BPXdrrr641%%)
+        ← 200 LoginUserResponse
+        ● Get user profile data
+        → GET /customer/profile
+        ← 200 GetCustomerProfileResponse
+        ● Get user profile data
+        → GET /customer/profile
+        ← 200 GetCustomerProfileResponse
