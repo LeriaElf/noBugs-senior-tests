@@ -1,0 +1,8 @@
+{
+  "method": "POST",
+  "url": "/accounts/deposit",
+  "body": {
+    "id": 11,
+    "balance": 3421
+  }
+}

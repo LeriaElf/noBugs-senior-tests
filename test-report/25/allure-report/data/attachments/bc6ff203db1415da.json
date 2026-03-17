@@ -1,0 +1,9 @@
+{
+  "status": 500,
+  "messages": {
+    "timestamp": "2026-03-17T14:07:20.919+00:00",
+    "status": 500,
+    "error": "Internal Server Error",
+    "path": "/api/v1/accounts/deposit"
+  }
+}
