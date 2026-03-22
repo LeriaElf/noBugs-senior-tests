@@ -1,5 +1,5 @@
-import { BaseModel } from "./baseModel.js";
-import { GetCustomerProfileResponse } from "./getCustomerProfileResponse.js";
+import { BaseModel } from './baseModel.js';
+import { GetCustomerProfileResponse } from './getCustomerProfileResponse.js';
 
 export class PutCustomerProfileResponse extends BaseModel {
   constructor({ customer, message }) {

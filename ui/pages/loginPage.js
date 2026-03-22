@@ -1,8 +1,8 @@
-import { BasePage } from "./basePage";
+import { BasePage } from './basePage';
 
 export class LoginPage extends BasePage {
   get url() {
-    return "/";
+    return '/';
   }
 
   async login(username, password) {

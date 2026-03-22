@@ -2,14 +2,25 @@ name: Run tests
 
 on:
   push:
+    branches-ignore:
+      - gh-pages
   workflow_dispatch:
 
 jobs:
   run-tests:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
 
       - name: Cache Docker images
         id: cache-docker
@@ -52,29 +63,82 @@ jobs:
 
       - name: Run tests
         run: |
-          mkdir -p test-output/logs test-output/api-report test-output/ui-report
+          mkdir -p allure-results swagger-coverage/output
           docker run --rm \
             --network nobugs-network \
-            -v ${{ github.workspace }}/test-output/logs:/app/logs \
-            -v ${{ github.workspace }}/test-output/api-report:/app/mochawesome-report \
-            -v ${{ github.workspace }}/test-output/ui-report:/app/playwright-report \
+            -v ${{ github.workspace }}/allure-results:/app/allure-results \
+            -v ${{ github.workspace }}/swagger-coverage/output:/app/swagger-coverage/output \
             -e CI=true \
             -e BASE_URL=http://backend:4111/api/v1 \
             -e UI_BASE_URL=http://nginx \
             -e "ADMIN_TOKEN=Basic YWRtaW46YWRtaW4=" \
             nobugs-tests
 
-      - name: Show test log
+      - name: Run Swagger coverage
         if: always()
-        run: cat test-output/logs/run.log 2>/dev/null || echo "No log file"
+        run: |
+          chmod +x ./swagger-coverage/swagger-coverage-commandline-1.5.0/bin/swagger-coverage-commandline
+          ./swagger-coverage/swagger-coverage-commandline-1.5.0/bin/swagger-coverage-commandline \
+            -s http://localhost:4111/v3/api-docs \
+            -i swagger-coverage/output
 
-      - name: Upload test reports
-        uses: actions/upload-artifact@v4
+      - name: Load test report history
+        uses: actions/checkout@v4
+        if: always()
+        continue-on-error: true
+        with:
+          ref: gh-pages
+          path: gh-pages
+
+      - name: Install Allure CLI
+        if: always()
+        run: npm install -g allure-commandline
+
+      - name: Build test report
+        if: always()
+        run: |
+          LAST_RUN=$(ls -1t gh-pages/test-report/ 2>/dev/null | grep -E '^[0-9]+$' | head -1)
+          [ -n "$LAST_RUN" ] && cp -r gh-pages/test-report/$LAST_RUN/allure-report/history allure-results/history 2>/dev/null || true
+          allure generate allure-results --clean -o allure-report
+
+      - name: Build Swagger coverage report
+        if: always()
+        run: |
+          mkdir -p test-report/${{ github.run_number }}/allure-report
+          mkdir -p test-report/${{ github.run_number }}/swagger-coverage
+          cp -r allure-report/. test-report/${{ github.run_number }}/allure-report/
+          cp swagger-coverage-report.html test-report/${{ github.run_number }}/swagger-coverage/index.html 2>/dev/null || true
+          cp swagger-coverage-results.json test-report/${{ github.run_number }}/swagger-coverage/ 2>/dev/null || true
+
+      - name: Quality gate — API coverage
+        if: always()
+        run: bash ./scripts/check-coverage.sh
+
+      - name: Prepare publish directory
+        if: always()
+        run: |
+          mkdir -p publish
+          cp -r test-report/. publish/test-report/
+          cat > publish/index.html << EOF
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta http-equiv="refresh" content="0; url=./test-report/${{ github.run_number }}/allure-report/">
+            <title>Redirecting to latest report...</title>
+          </head>
+          <body>Redirecting to latest report...</body>
+          </html>
+          EOF
+
+      - name: Publish test report
+        uses: peaceiris/actions-gh-pages@v3
         if: always()
         with:
-          name: test-reports-${{ github.run_number }}
-          path: test-output/
-          retention-days: 7
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: publish
+          destination_dir: .
+          keep_files: true
 
       - name: Stop services
         if: always()

@@ -1,4 +1,4 @@
-import { BaseModel } from "./baseModel.js";
+import { BaseModel } from './baseModel.js';
 
 export class AccountTransferRequest extends BaseModel {
   constructor({ senderAccountId, receiverAccountId, amount }) {

@@ -15,3 +15,9 @@ midTest/
 
 /allure-report/
 /allure-results/
+/swagger-coverage/output/
+/swagger-coverage/swagger-coverage.zip
+/swagger-coverage/swagger-coverage-commandline.jar
+swagger-coverage-report.html
+swagger-coverage-results.json
+xunit.xml

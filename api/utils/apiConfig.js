@@ -1,11 +1,11 @@
-import "dotenv/config";
+import 'dotenv/config';
 
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
 
 export class ApiConfig {
   static #defaultHeaders = {
-    "Content-Type": "application/json",
-    Accept: "application/json",
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
   };
 
   static get unAuth() {

@@ -1,7 +1,7 @@
-import { BasePage } from "./basePage";
-import { expect } from "@playwright/test";
-import { URLS } from "../utils/urls.js";
-import { AccountForm } from "../pages/elements/accountForm.js";
+import { BasePage } from './basePage';
+import { expect } from '@playwright/test';
+import { URLS } from '../utils/urls.js';
+import { AccountForm } from '../pages/elements/accountForm.js';
 
 export class DepositPage extends BasePage {
   constructor(page) {
@@ -14,13 +14,11 @@ export class DepositPage extends BasePage {
   }
 
   get depositButton() {
-    return this.page.getByText("💵 Deposit", { exact: true });
+    return this.page.getByText('💵 Deposit', { exact: true });
   }
 
   async titleIsVisible() {
-    await expect(
-      this.page.getByText("💰 Deposit Money", { exact: true }),
-    ).toBeVisible();
+    await expect(this.page.getByText('💰 Deposit Money', { exact: true })).toBeVisible();
     return this;
   }
 

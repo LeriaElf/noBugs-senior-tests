@@ -4,8 +4,8 @@ export const BankAlert = Object.freeze({
   },
   USERNAME_MUST_BE_BETWEEN_3_AND_15_CHARACTERS: {
     message:
-      // '❌ Failed to create user:\n\n• username: Username must contain only letters, digits, dashes, underscores, and dots', //BUG
-      '❌ Failed to create user:\n\n• username: Username must be between 3 and 15 characters,Username must contain only letters, digits, dashes, underscores, and dots',
+      '❌ Failed to create user:\n\n• username: Username must contain only letters, digits, dashes, underscores, and dots', //BUG
+    // '❌ Failed to create user:\n\n• username: Username must be between 3 and 15 characters,Username must contain only letters, digits, dashes, underscores, and dots',
   },
   NEW_ACCOUNT_ADDED: { message: '✅ New Account Created! Account Number:' },
   DEPOSIT_SUCCESS: { message: '✅ Successfully deposited' },

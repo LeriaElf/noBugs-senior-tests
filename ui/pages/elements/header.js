@@ -8,17 +8,13 @@ export class Header {
   }
 
   async getUserName() {
-    return await this.userInfo
-      .locator("//span[@class = 'user-name']")
-      .innerText();
+    return await this.userInfo.locator("//span[@class = 'user-name']").innerText();
   }
 
   async getUserUserName() {
-    const text = await this.userInfo
-      .locator("//span[@class = 'user-username']")
-      .innerText();
+    const text = await this.userInfo.locator("//span[@class = 'user-username']").innerText();
 
-    return text.replace("@", "");
+    return text.replace('@', '');
   }
 
   async userInfoClick() {

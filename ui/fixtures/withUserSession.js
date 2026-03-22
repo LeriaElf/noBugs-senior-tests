@@ -1,5 +1,5 @@
-import { test as sessionBase } from "../fixtures/sessionStorage";
-import { AdminSteps } from "@/api/utils/steps/adminSteps";
+import { test as sessionBase } from '../fixtures/sessionStorage';
+import { AdminSteps } from '@/api/utils/steps/adminSteps';
 
 export const test = sessionBase.extend({
   withUserSession: [
@@ -18,7 +18,7 @@ export const test = sessionBase.extend({
       }
       await use(withUserSessions);
     },
-    { scope: "worker" }, //почему на воркер а не на тест?
+    { scope: 'worker' }, //почему на воркер а не на тест?
   ],
 });
 

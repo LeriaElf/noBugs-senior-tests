@@ -1,6 +1,6 @@
-import { expect } from "@playwright/test";
-import { AMOUNT_RE, ACCOUNT_RE } from "../../utils/patterns.js";
-import { AccountDepositRequest } from "../../../api/models/accountDepositRequest.js";
+import { expect } from '@playwright/test';
+import { AMOUNT_RE, ACCOUNT_RE } from '../../utils/patterns.js';
+import { AccountDepositRequest } from '../../../api/models/accountDepositRequest.js';
 
 export class AccountForm {
   constructor(page) {
@@ -8,25 +8,23 @@ export class AccountForm {
   }
 
   get selectAccountOption() {
-    return this.page.locator(
-      "//select[./option[text() = '-- Choose an account --' ]]",
-    );
+    return this.page.locator("//select[./option[text() = '-- Choose an account --' ]]");
   }
 
   get amountInput() {
-    return this.page.getByPlaceholder("Enter amount");
+    return this.page.getByPlaceholder('Enter amount');
   }
 
   get recipientNameInput() {
-    return this.page.getByPlaceholder("Enter recipient name");
+    return this.page.getByPlaceholder('Enter recipient name');
   }
 
   get recipientAccountInput() {
-    return this.page.getByPlaceholder("Enter recipient account number");
+    return this.page.getByPlaceholder('Enter recipient account number');
   }
 
   async chooseAccount(accountNumber) {
-    const value = String(accountNumber).replace(/^ACC/i, "");
+    const value = String(accountNumber).replace(/^ACC/i, '');
     await this.selectAccountOption.selectOption(value);
 
     return this;
@@ -46,10 +44,8 @@ export class AccountForm {
   }
 
   async getSelectedAccountBalance(accountNumber) {
-    const accountId = accountNumber.replace("ACC", "");
-    const text = await this.page
-      .locator(`//option[@value="${accountId}"]`)
-      .textContent();
+    const accountId = accountNumber.replace('ACC', '');
+    const text = await this.page.locator(`//option[@value="${accountId}"]`).textContent();
     expect(text.match(ACCOUNT_RE)[1]).toBe(accountNumber);
 
     return text.match(AMOUNT_RE)?.[1];

@@ -1,6 +1,6 @@
-import RandExp from "randexp";
+import RandExp from 'randexp';
 
-export const generateDataForEntity = (model) => {
+export const generateDataForEntity = model => {
   const generatedData = {};
 
   for (const field in model) {
@@ -12,17 +12,17 @@ export const generateDataForEntity = (model) => {
       continue;
     }
 
-    if (fieldType === "string") {
+    if (fieldType === 'string') {
       if (fieldRules.regex) {
         generatedData[field] = new RandExp(fieldRules.regex).gen();
       } else {
         generatedData[field] = Math.random().toString(36).substring(7);
       }
-    } else if (fieldType === "number") {
+    } else if (fieldType === 'number') {
       const min = fieldRules.min || 0;
       const max = fieldRules.max || 100;
       generatedData[field] = Math.floor(Math.random() * (max - min + 1)) + min;
-    } else if (fieldType === "boolean") {
+    } else if (fieldType === 'boolean') {
       generatedData[field] = Math.random() < 0.5;
     }
   }

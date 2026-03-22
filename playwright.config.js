@@ -6,7 +6,10 @@ export default defineConfig({
   fullyParallel: true,
   retries: 0,
   workers: undefined,
-  reporter: [['list'], ['html', { outputFolder: 'playwright-report' }]],
+  reporter: [
+    ['line'],
+    ['allure-playwright', { resultsDir: 'allure-results', cleanResultsDir: false }],
+  ],
   use: {
     headless: process.env.CI === 'true',
     baseURL: process.env.UI_BASE_URL || 'http://localhost:3000',

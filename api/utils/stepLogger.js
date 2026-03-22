@@ -1,13 +1,15 @@
+import { attachment, step } from 'allure-js-commons';
+
 const COLORS = {
-  reset: "\x1b[0m",
-  dim: "\x1b[2m",
-  green: "\x1b[32m",
-  yellow: "\x1b[33m",
-  red: "\x1b[31m",
-  cyan: "\x1b[36m",
+  reset: '\x1b[0m',
+  dim: '\x1b[2m',
+  green: '\x1b[32m',
+  yellow: '\x1b[33m',
+  red: '\x1b[31m',
+  cyan: '\x1b[36m',
 };
 
-const INDENT = "      ";
+const INDENT = '      ';
 
 function colorForStatus(status) {
   if (status >= 200 && status < 300) return COLORS.green;
@@ -16,22 +18,27 @@ function colorForStatus(status) {
 }
 
 export const stepLogger = {
-  request(method, url, data) {
+  async request(method, url, data) {
     const methodStr = `${COLORS.cyan}${method.toUpperCase()}${COLORS.reset}`;
     const urlStr = `${url}`;
     let line = `${INDENT}  → ${methodStr} ${urlStr}`;
 
-    if (data && typeof data === "object") {
+    if (data && typeof data === 'object') {
       const summary = Object.entries(data)
         .map(([k, v]) => `${k}: ${v}`)
-        .join(", ");
+        .join(', ');
       line += ` ${COLORS.dim}(${summary})${COLORS.reset}`;
     }
 
     console.log(line);
+    await attachment(
+      `Request: ${method.toUpperCase()} ${url}`,
+      JSON.stringify({ method: method.toUpperCase(), url, body: data }, null, 2),
+      'application/json',
+    );
   },
 
-  response(status, modelName) {
+  async response(status, modelName) {
     const color = colorForStatus(status);
     let line = `${INDENT}  ← ${color}${status}${COLORS.reset}`;
 
@@ -40,19 +47,28 @@ export const stepLogger = {
     }
 
     console.log(line);
-  },
-
-  error(status, errorMessages) {
-    const color = colorForStatus(status);
-    const msgs = Array.isArray(errorMessages)
-      ? errorMessages.join("; ")
-      : errorMessages;
-    console.log(
-      `${INDENT}  ← ${color}${status}${COLORS.reset} ${COLORS.dim}${msgs}${COLORS.reset}`,
+    await attachment(
+      `Response: ${status}`,
+      JSON.stringify({ status, model: modelName }, null, 2),
+      'application/json',
     );
   },
 
-  step(message) {
+  async error(status, errorMessages) {
+    const color = colorForStatus(status);
+    const msgs = Array.isArray(errorMessages) ? errorMessages.join('; ') : errorMessages;
+    console.log(
+      `${INDENT}  ← ${color}${status}${COLORS.reset} ${COLORS.dim}${msgs}${COLORS.reset}`,
+    );
+    await attachment(
+      `Error: ${status}`,
+      JSON.stringify({ status, messages: errorMessages }, null, 2),
+      'application/json',
+    );
+  },
+
+  async step(message, fn) {
     console.log(`${INDENT}  ● ${message}`);
+    if (fn) return await step(message, fn);
   },
 };
