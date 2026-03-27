@@ -1,0 +1,9 @@
+        ● Create user with username "1HNTSVPFMUMR0" and password "KUBbaip325$&"
+        → POST /admin/users (username: 1HNTSVPFMUMR0, password: KUBbaip325$&, role: USER)
+        ← 201 CreateUserResponse
+        ● Login user with username "1HNTSVPFMUMR0" and password "KUBbaip325$&"
+        → POST /auth/login (username: 1HNTSVPFMUMR0, password: KUBbaip325$&)
+        ← 200 LoginUserResponse
+        ● Create account for user
+        → POST /accounts
+        ← 201 CreateAccountResponse
