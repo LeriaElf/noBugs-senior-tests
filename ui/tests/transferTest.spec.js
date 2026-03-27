@@ -6,31 +6,38 @@ import { URLS } from '../utils/urls.js';
 import { parseAlertAmount, parseAlertAccount } from '../utils/patterns.js';
 import { generateNonExistentAccount } from '../utils/generateNonExistentAccount.js';
 import { setupSenderWithAccount } from '../helpers/setupSenderWithAccount.js';
+import { ApiConfig } from '../../api/utils/apiConfig.js';
+import { ENDPOINT_KEY } from '../../api/utils/enpoints.js';
+import { ValidatedRequester } from '../../api/utils/validatedRequester.js';
+import { RequestSpecs } from '../../api/utils/requestSpecs.js';
+import { ResponseSpecs } from '../../api/utils/responseSpecs.js';
 
 test.describe('Transfer Service Tests', () => {
-  test("User should be able to transfer valid amount between user's accounts", async ({
+  test("@UserSession(amount=1); User should be able to transfer valid amount between user's accounts", async ({
     page,
-    withUserSession,
-    authWithToken,
+    userSession,
   }) => {
     const userDashboard = new UserDashboard(page);
 
-    const { steps, firstAccount, secondAccount, userName } =
-      await test.step('Precondition: create user, authorize, create accounts', async () => {
-        const { steps, token, accounts, userName } = await setupSenderWithAccount(
-          { withUserSession },
-          2,
-        );
-        await authWithToken({
-          token,
-          goto: URLS.DASHBOARD,
-        });
+    const { firstAccount, secondAccount, userName, userAuth } = await test.step(
+      'Precondition: create two funded accounts for authorized user',
+      async () => {
+        await page.goto(URLS.DASHBOARD);
         await userDashboard.expectLoaded();
 
-        const [firstAccount, secondAccount] = accounts;
+        const firstAccount = await userSession.steps.createAccount();
+        const firstDeposit = await userSession.steps.depositeToAccount(firstAccount.accountId);
+        const secondAccount = await userSession.steps.createAccount();
+        const secondDeposit = await userSession.steps.depositeToAccount(secondAccount.accountId);
 
-        return { steps, firstAccount, secondAccount, userName };
-      });
+        return {
+          firstAccount: { ...firstAccount, balance: firstDeposit.balance },
+          secondAccount: { ...secondAccount, balance: secondDeposit.balance },
+          userName: userSession.user.username,
+          userAuth: ApiConfig.getUserAuth(userSession.token),
+        };
+      },
+    );
 
     await test.step("Transfer money between user's accounts", async () => {
       const userDashboard = new UserDashboard(page);
@@ -52,7 +59,13 @@ test.describe('Transfer Service Tests', () => {
       expect(parseAlertAmount(alertMessage)).toBe(firstAccount.balance);
       expect(parseAlertAccount(alertMessage)).toBe(secondAccount.accountNumber);
 
-      const { accounts } = await steps.getCustomerAccaunts();
+      const { data } = await new ValidatedRequester(
+        RequestSpecs.withConfig(userAuth),
+        ENDPOINT_KEY.CUSTOMER_ACCOUNTS,
+        ResponseSpecs.okArrayBy('accounts'),
+      ).get();
+
+      const { accounts } = data;
       const senderAccount = accounts.find(acc => acc.accountNumber === firstAccount.accountNumber);
       expect(senderAccount.balance).toBe(0);
 
@@ -135,29 +148,28 @@ test.describe('Transfer Service Tests', () => {
     });
   });
 
-  test('User should not be able to transfer to a non-existent account', async ({
+  test('@UserSession(amount=1); User should not be able to transfer to a non-existent account', async ({
     page,
-    withUserSession,
-    authWithToken,
+    userSession,
   }) => {
     const userDashboard = new UserDashboard(page);
 
-    const { steps, account, userName } =
-      await test.step('Precondition: create user, authorize, create account', async () => {
-        const {
-          steps,
-          token,
-          accounts: [account],
-          userName,
-        } = await setupSenderWithAccount({ withUserSession });
-        await authWithToken({
-          token,
-          goto: URLS.DASHBOARD,
-        });
+    const { account, userName, userAuth } = await test.step(
+      'Precondition: create funded account for authorized user',
+      async () => {
+        await page.goto(URLS.DASHBOARD);
         await userDashboard.expectLoaded();
 
-        return { steps, account, userName };
-      });
+        const account = await userSession.steps.createAccount();
+        const deposit = await userSession.steps.depositeToAccount(account.accountId);
+
+        return {
+          account: { ...account, balance: deposit.balance },
+          userName: userSession.user.username,
+          userAuth: ApiConfig.getUserAuth(userSession.token),
+        };
+      },
+    );
 
     await test.step('Transfer money to a non-existent account', async () => {
       await userDashboard.clickTransferButton();
@@ -177,26 +189,28 @@ test.describe('Transfer Service Tests', () => {
         transferPage.clickTransferButton(),
       );
 
-      const { accounts } = await steps.getCustomerAccaunts();
+      const { data } = await new ValidatedRequester(
+        RequestSpecs.withConfig(userAuth),
+        ENDPOINT_KEY.CUSTOMER_ACCOUNTS,
+        ResponseSpecs.okArrayBy('accounts'),
+      ).get();
+
+      const { accounts } = data;
       const senderAccount = accounts.find(acc => acc.accountNumber === account.accountNumber);
       expect(senderAccount.balance).toBe(account.balance);
     });
   });
 
-  test('User should not be able to transfer with blank/unchecked fields', async ({
+  test('@UserSession(amount=1); User should not be able to transfer with blank/unchecked fields', async ({
     page,
-    withUserSession,
-    authWithToken,
+    userSession,
   }) => {
     const userDashboard = new UserDashboard(page);
 
-    await test.step('Precondition: create user, authorize, create account', async () => {
-      const { token } = await setupSenderWithAccount({ withUserSession });
-      await authWithToken({
-        token,
-        goto: URLS.DASHBOARD,
-      });
+    await test.step('Precondition: open dashboard for authorized user', async () => {
+      await page.goto(URLS.DASHBOARD);
       await userDashboard.expectLoaded();
+      await userSession.steps.createAccount();
     });
 
     await test.step('Transfer money with blank fields', async () => {
@@ -211,29 +225,28 @@ test.describe('Transfer Service Tests', () => {
     });
   });
 
-  test('User should not be able to transfer with zero amount', async ({
+  test('@UserSession(amount=1); User should not be able to transfer with zero amount', async ({
     page,
-    withUserSession,
-    authWithToken,
+    userSession,
   }) => {
     const userDashboard = new UserDashboard(page);
 
-    const { steps, account, userName } =
-      await test.step('Precondition: create user, authorize, create account', async () => {
-        const {
-          steps,
-          token,
-          accounts: [account],
-          userName,
-        } = await setupSenderWithAccount({ withUserSession });
-        await authWithToken({
-          token,
-          goto: URLS.DASHBOARD,
-        });
+    const { account, userName, userAuth } = await test.step(
+      'Precondition: create funded account for authorized user',
+      async () => {
+        await page.goto(URLS.DASHBOARD);
         await userDashboard.expectLoaded();
 
-        return { steps, account, userName };
-      });
+        const account = await userSession.steps.createAccount();
+        const deposit = await userSession.steps.depositeToAccount(account.accountId);
+
+        return {
+          account: { ...account, balance: deposit.balance },
+          userName: userSession.user.username,
+          userAuth: ApiConfig.getUserAuth(userSession.token),
+        };
+      },
+    );
 
     await test.step('Transfer money with zero amount', async () => {
       await userDashboard.clickTransferButton();
@@ -251,35 +264,40 @@ test.describe('Transfer Service Tests', () => {
         transferPage.clickTransferButton(),
       );
 
-      const { accounts } = await steps.getCustomerAccaunts();
+      const { data } = await new ValidatedRequester(
+        RequestSpecs.withConfig(userAuth),
+        ENDPOINT_KEY.CUSTOMER_ACCOUNTS,
+        ResponseSpecs.okArrayBy('accounts'),
+      ).get();
+
+      const { accounts } = data;
       const senderAccount = accounts.find(acc => acc.accountNumber === account.accountNumber);
       expect(senderAccount.balance).toBe(account.balance);
     });
   });
 
-  test('User should not be able to transfer without confirm checkbox', async ({
+  test('@UserSession(amount=1); User should not be able to transfer without confirm checkbox', async ({
     page,
-    withUserSession,
-    authWithToken,
+    userSession,
   }) => {
     const userDashboard = new UserDashboard(page);
 
-    const { steps, account, userName } =
-      await test.step('Precondition: create user, authorize, create account', async () => {
-        const {
-          steps,
-          token,
-          accounts: [account],
-          userName,
-        } = await setupSenderWithAccount({ withUserSession });
-        await authWithToken({
-          token,
-          goto: URLS.DASHBOARD,
-        });
+    const { account, userName, userAuth } = await test.step(
+      'Precondition: create funded account for authorized user',
+      async () => {
+        await page.goto(URLS.DASHBOARD);
         await userDashboard.expectLoaded();
 
-        return { steps, account, userName };
-      });
+        const account = await userSession.steps.createAccount();
+        const deposit = await userSession.steps.depositeToAccount(account.accountId);
+
+        return {
+          account: { ...account, balance: deposit.balance },
+          userName: userSession.user.username,
+          userAuth: ApiConfig.getUserAuth(userSession.token),
+        };
+      },
+    );
 
     await test.step('Transfer money without confirm checkbox', async () => {
       await userDashboard.clickTransferButton();
@@ -296,7 +314,13 @@ test.describe('Transfer Service Tests', () => {
         transferPage.clickTransferButton(),
       );
 
-      const { accounts } = await steps.getCustomerAccaunts();
+      const { data } = await new ValidatedRequester(
+        RequestSpecs.withConfig(userAuth),
+        ENDPOINT_KEY.CUSTOMER_ACCOUNTS,
+        ResponseSpecs.okArrayBy('accounts'),
+      ).get();
+
+      const { accounts } = data;
       const senderAccount = accounts.find(acc => acc.accountNumber === account.accountNumber);
       expect(senderAccount.balance).toBe(account.balance);
     });

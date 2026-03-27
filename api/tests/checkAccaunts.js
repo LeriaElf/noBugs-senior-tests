@@ -1,19 +1,22 @@
 import { expect } from 'chai';
-import { HTTP_STATUS } from '../utils/httpStatus.js';
-import { ENPOINT_KEY } from '../utils/enpoints.js';
-import { requester } from '../utils/requester.js';
+import { ENDPOINT_KEY } from '../utils/enpoints.js';
 import { ApiConfig } from '../utils/apiConfig.js';
 import { userSteps } from '../utils/fixtures.js';
 import { AdminSteps } from '../utils/steps/adminSteps.js';
+import { RequestSpecs } from '../utils/requestSpecs.js';
+import { ResponseSpecs } from '../utils/responseSpecs.js';
+import { ValidatedRequester } from '../utils/validatedRequester.js';
 
 describe('Account Servise tests', function () {
   let token;
   let userId;
+  let auth;
 
   before(async () => {
     const response = await userSteps.createUserWithAccounts();
     token = response.token;
     userId = response.userId;
+    auth = RequestSpecs.withConfig(ApiConfig.getUserAuth(token));
   });
 
   after(async () => {
@@ -21,12 +24,12 @@ describe('Account Servise tests', function () {
   });
 
   it('User shoud be able to see all their accounts', async () => {
-    const { status, data } = await requester.request(ENPOINT_KEY.CUSTOMER_ACCOUNTS, {
-      config: ApiConfig.getUserAuth(token),
-      stepName: 'Get all customer accounts',
-    });
+    const { data } = await new ValidatedRequester(
+      auth,
+      ENDPOINT_KEY.CUSTOMER_ACCOUNTS,
+      ResponseSpecs.okArrayBy('accounts'),
+    ).get({ stepName: 'Get all customer accounts' });
 
-    expect(status).to.equal(HTTP_STATUS.OK);
     expect(data.accounts).to.have.lengthOf(2);
 
     for (const account of data.accounts) {

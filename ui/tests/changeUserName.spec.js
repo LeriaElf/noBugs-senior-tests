@@ -6,31 +6,34 @@ import { URLS } from '../utils/urls.js';
 import { PutCustomerProfileRequest } from '../../api/models/putCustomerProfileRequest.js';
 import { generateInvalidName } from '../utils/generateInvalidName.js';
 import { nonameUser } from '../utils/constants.js';
+import { ApiConfig } from '../../api/utils/apiConfig.js';
+import { ENDPOINT_KEY } from '../../api/utils/enpoints.js';
+import { ValidatedRequester } from '../../api/utils/validatedRequester.js';
+import { RequestSpecs } from '../../api/utils/requestSpecs.js';
+import { ResponseSpecs } from '../../api/utils/responseSpecs.js';
 
 test.describe('Customer Servise tests', () => {
-  test('User shoud be able to change profile name', async ({
+  test('@UserSession(amount=1); User shoud be able to change profile name', async ({
     page,
-    withUserSession,
-    authWithToken,
+    userSession,
   }) => {
     const userDashboard = new UserDashboard(page);
     const { name: correctName } = PutCustomerProfileRequest.generateProfileName();
+    const userAuth = ApiConfig.getUserAuth(userSession.token);
 
-    const { steps, userProfile } =
-      await test.step('Precondition: create user, authorize', async () => {
-        const [session] = await withUserSession(1);
+    const { userProfile } = await test.step('Precondition: open dashboard for authorized user', async () => {
+      await page.goto(URLS.DASHBOARD);
+      const { data } = await new ValidatedRequester(
+        RequestSpecs.withConfig(userAuth),
+        ENDPOINT_KEY.CUSTOMER_PROFILE_GET,
+        ResponseSpecs.ok(),
+      ).get();
 
-        /** @type {import('../../api/utils/steps/userSteps').UserSteps} */
-        const { steps, token } = session;
+      const userDashboard = new UserDashboard(page);
+      await userDashboard.expectLoaded();
 
-        await authWithToken({ token, goto: URLS.DASHBOARD });
-        const { data } = await steps.getUserProfileData();
-
-        const userDashboard = new UserDashboard(page);
-        await userDashboard.expectLoaded();
-
-        return { steps, userProfile: data };
-      });
+      return { userProfile: data };
+    });
 
     await test.step('Change profile name', async () => {
       expect(await userDashboard.header.getUserUserName()).toBe(userProfile.username);
@@ -53,7 +56,11 @@ test.describe('Customer Servise tests', () => {
 
       await profilePage.homeButtonClick();
 
-      const { data } = await steps.getUserProfileData();
+      const { data } = await new ValidatedRequester(
+        RequestSpecs.withConfig(userAuth),
+        ENDPOINT_KEY.CUSTOMER_PROFILE_GET,
+        ResponseSpecs.ok(),
+      ).get();
       expect(data.name).toBe(correctName);
 
       await page.reload();
@@ -76,24 +83,19 @@ test.describe('Customer Servise tests', () => {
     });
   });
 
-  test('User shoud not be able to change profile name with invalid value', async ({
+  test('@UserSession(amount=1); User shoud not be able to change profile name with invalid value', async ({
     page,
-    withUserSession,
-    authWithToken,
+    userSession,
   }) => {
     const userDashboard = new UserDashboard(page);
     const incorrectName = generateInvalidName();
+    const userAuth = ApiConfig.getUserAuth(userSession.token);
 
-    const { steps } = await test.step('Precondition: create user, authorize', async () => {
-      const [session] = await withUserSession(1);
-      const { steps, token } = session;
-
-      await authWithToken({ token, goto: URLS.DASHBOARD });
+    await test.step('Precondition: open dashboard for authorized user', async () => {
+      await page.goto(URLS.DASHBOARD);
 
       const userDashboard = new UserDashboard(page);
       await userDashboard.expectLoaded();
-
-      return { steps };
     });
 
     await test.step('Change profile name with invalid value', async () => {
@@ -110,7 +112,11 @@ test.describe('Customer Servise tests', () => {
       await profilePage.homeButtonClick();
       expect(userDashboard.welcomeText).toContainText(nonameUser.toLowerCase());
 
-      const { data } = await steps.getUserProfileData();
+      const { data } = await new ValidatedRequester(
+        RequestSpecs.withConfig(userAuth),
+        ENDPOINT_KEY.CUSTOMER_PROFILE_GET,
+        ResponseSpecs.ok(),
+      ).get();
       expect(data.name).toBeNull();
 
       await page.reload();

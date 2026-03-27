@@ -1,7 +1,6 @@
 import { expect } from 'chai';
 import { HTTP_STATUS } from '../utils/httpStatus.js';
-import { ENPOINT_KEY } from '../utils/enpoints.js';
-import { requester } from '../utils/requester.js';
+import { ENDPOINT_KEY } from '../utils/enpoints.js';
 import { ApiConfig } from '../utils/apiConfig.js';
 import { userSteps } from '../utils/fixtures.js';
 import { AdminSteps } from '../utils/steps/adminSteps.js';
@@ -10,18 +9,23 @@ import { AccountTransferRequest } from '../models/accountTransferRequest.js';
 import { AccountTransferResponse } from '../models/accountTransferResponse.js';
 import { assertThatModels } from '../models/comparison/modelAssertions.js';
 import { ExpectedError } from '../models/expectedError.js';
-import { TRANSFER_ERRORS, KEY_ERRORS } from '../utils/responseSpec.js';
+import { TRANSFER_ERRORS, KEY_ERRORS } from '../utils/responseTitles.js';
+import { RequestSpecs } from '../utils/requestSpecs.js';
+import { ResponseSpecs } from '../utils/responseSpecs.js';
+import { ValidatedRequester } from '../utils/validatedRequester.js';
 
 describe('Transfer Service tests', function () {
   let token;
   let accountIds;
   let usersId = [];
+  let auth;
 
   before(async () => {
     const response = await userSteps.createUserWithAccounts(3);
     token = response.token;
     accountIds = response.accountIds;
     usersId.push(response.userId);
+    auth = RequestSpecs.withConfig(ApiConfig.getUserAuth(token));
   });
 
   beforeEach(async () => {
@@ -61,14 +65,16 @@ describe('Transfer Service tests', function () {
         amount,
       });
 
-      const { status, data } = await requester.request(ENPOINT_KEY.ACCOUNTS_TRANSFER, {
+      const { data } = await new ValidatedRequester(
+        auth,
+        ENDPOINT_KEY.ACCOUNTS_TRANSFER,
+        ResponseSpecs.ok(),
+      ).post({
         data: requestData,
-        config: ApiConfig.getUserAuth(token),
         stepName: `Transfer ${amount} from account ${sender.id} to account ${receiverAccount.id}`,
       });
       const responseData = new AccountTransferResponse(data);
 
-      expect(status).to.equal(HTTP_STATUS.OK);
       await assertThatModels(requestData, responseData).match();
 
       const { accounts: newAccauntsData } = await userSteps.getCustomerAccaunts(token);
@@ -116,14 +122,16 @@ describe('Transfer Service tests', function () {
       amount: initialSenderBalance,
     });
 
-    const { status, data } = await requester.request(ENPOINT_KEY.ACCOUNTS_TRANSFER, {
+    const { data } = await new ValidatedRequester(
+      auth,
+      ENDPOINT_KEY.ACCOUNTS_TRANSFER,
+      ResponseSpecs.ok(),
+    ).post({
       data: requestData,
-      config: ApiConfig.getUserAuth(token),
       stepName: `Transfer ${initialSenderBalance} to external account ${receiverId}`,
     });
     const responseData = new AccountTransferResponse(data);
 
-    expect(status).to.equal(HTTP_STATUS.OK);
     await assertThatModels(requestData, responseData).match();
 
     const { accounts: newAccauntsData } = await userSteps.getCustomerAccaunts(token);
@@ -158,7 +166,7 @@ describe('Transfer Service tests', function () {
       errorMessages: [TRANSFER_ERRORS.INVALID_TRANSFER],
     });
 
-    await errorHandlingRequester.requestExpectingError(ENPOINT_KEY.ACCOUNTS_TRANSFER, {
+    await errorHandlingRequester.requestExpectingError(ENDPOINT_KEY.ACCOUNTS_TRANSFER, {
       data: requestData,
       config: ApiConfig.getUserAuth(token),
       expectedError,
@@ -187,7 +195,7 @@ describe('Transfer Service tests', function () {
       errorMessages: [TRANSFER_ERRORS.INVALID_TRANSFER],
     });
 
-    await errorHandlingRequester.requestExpectingError(ENPOINT_KEY.ACCOUNTS_TRANSFER, {
+    await errorHandlingRequester.requestExpectingError(ENDPOINT_KEY.ACCOUNTS_TRANSFER, {
       data: requestData,
       config: ApiConfig.getUserAuth(token),
       expectedError,
@@ -217,7 +225,7 @@ describe('Transfer Service tests', function () {
       errorMessages: [TRANSFER_ERRORS.TRANSFER_MAX],
     });
 
-    await errorHandlingRequester.requestExpectingError(ENPOINT_KEY.ACCOUNTS_TRANSFER, {
+    await errorHandlingRequester.requestExpectingError(ENDPOINT_KEY.ACCOUNTS_TRANSFER, {
       data: requestData,
       config: ApiConfig.getUserAuth(token),
       expectedError,
@@ -264,7 +272,7 @@ describe('Transfer Service tests', function () {
         errorMessages,
       });
 
-      await errorHandlingRequester.requestExpectingError(ENPOINT_KEY.ACCOUNTS_TRANSFER, {
+      await errorHandlingRequester.requestExpectingError(ENDPOINT_KEY.ACCOUNTS_TRANSFER, {
         data: requestData,
         config: ApiConfig.getUserAuth(token),
         expectedError,

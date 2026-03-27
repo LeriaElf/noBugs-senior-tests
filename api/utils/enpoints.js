@@ -17,7 +17,7 @@ import { GetTransactionRequest } from '../models/getTransactionRequest.js';
 import { GetTransactionResponse } from '../models/getTransactionResponse.js';
 import { DeleteUserResponse } from '../models/deleteUserResponse.js';
 
-export const ENPOINT_KEY = {
+export const ENDPOINT_KEY = {
   ADMIN_CREATE_USER: 'ADMIN_CREATE_USER',
   ADMIN_GET_ALL_USERS: 'ADMIN_GET_ALL_USERS',
   ADMIN_DELETE_USER: 'ADMIN_DELETE_USER',
@@ -32,69 +32,69 @@ export const ENPOINT_KEY = {
 };
 
 export const endpoints = {
-  [ENPOINT_KEY.ADMIN_CREATE_USER]: {
+  [ENDPOINT_KEY.ADMIN_CREATE_USER]: {
     url: '/admin/users',
     method: 'post',
     requestModel: CreateUserRequest,
     responseModel: CreateUserResponse,
   },
-  [ENPOINT_KEY.ADMIN_GET_ALL_USERS]: {
+  [ENDPOINT_KEY.ADMIN_GET_ALL_USERS]: {
     url: '/admin/users',
     method: 'get',
     requestModel: BaseModel,
     responseModel: GetAllUsersResponse,
   },
-  [ENPOINT_KEY.ADMIN_DELETE_USER]: {
+  [ENDPOINT_KEY.ADMIN_DELETE_USER]: {
     url: userId => `/admin/users/${userId}`,
     templateUrl: '/admin/users/{id}',
     method: 'delete',
     requestModel: BaseModel,
     responseModel: DeleteUserResponse,
   },
-  [ENPOINT_KEY.LOGIN]: {
+  [ENDPOINT_KEY.LOGIN]: {
     url: '/auth/login',
     method: 'post',
     requestModel: LoginUserRequest,
     responseModel: LoginUserResponse,
   },
-  [ENPOINT_KEY.ACCOUNTS_CREATE]: {
+  [ENDPOINT_KEY.ACCOUNTS_CREATE]: {
     url: '/accounts',
     method: 'post',
     requestModel: BaseModel,
     responseModel: CreateAccountResponse,
   },
-  [ENPOINT_KEY.ACCOUNTS_TRANSFER]: {
+  [ENDPOINT_KEY.ACCOUNTS_TRANSFER]: {
     url: '/accounts/transfer',
     method: 'post',
     requestModel: AccountTransferRequest,
     responseModel: AccountTransferResponse,
   },
-  [ENPOINT_KEY.ACCOUNTS_DEPOSIT]: {
+  [ENDPOINT_KEY.ACCOUNTS_DEPOSIT]: {
     url: '/accounts/deposit',
     method: 'post',
     requestModel: AccountDepositRequest,
     responseModel: AccountDepositResponse,
   },
-  [ENPOINT_KEY.ACCOUNTS_TRANSACTIONS]: {
+  [ENDPOINT_KEY.ACCOUNTS_TRANSACTIONS]: {
     url: accountId => `/accounts/${accountId}/transactions`,
     templateUrl: '/accounts/{accountId}/transactions',
     method: 'get',
     requestModel: GetTransactionRequest,
     responseModel: GetTransactionResponse,
   },
-  [ENPOINT_KEY.CUSTOMER_PROFILE_GET]: {
+  [ENDPOINT_KEY.CUSTOMER_PROFILE_GET]: {
     url: '/customer/profile',
     method: 'get',
     requestModel: BaseModel,
     responseModel: GetCustomerProfileResponse,
   },
-  [ENPOINT_KEY.CUSTOMER_PROFILE_PUT]: {
+  [ENDPOINT_KEY.CUSTOMER_PROFILE_PUT]: {
     url: '/customer/profile',
     method: 'put',
     requestModel: PutCustomerProfileRequest,
     responseModel: PutCustomerProfileResponse,
   },
-  [ENPOINT_KEY.CUSTOMER_ACCOUNTS]: {
+  [ENDPOINT_KEY.CUSTOMER_ACCOUNTS]: {
     url: '/customer/accounts',
     method: 'get',
     requestModel: BaseModel,

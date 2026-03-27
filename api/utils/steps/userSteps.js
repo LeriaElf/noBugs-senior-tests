@@ -1,6 +1,6 @@
 import { requester } from '../requester.js';
 import { ApiConfig } from '../apiConfig.js';
-import { ENPOINT_KEY } from '../enpoints.js';
+import { ENDPOINT_KEY } from '../enpoints.js';
 import { LoginUserRequest } from '../../models/loginUserRequest.js';
 import { AccountDepositRequest } from '../../models/accountDepositRequest.js';
 import { AdminSteps } from './adminSteps.js';
@@ -36,7 +36,7 @@ export class UserSteps {
     return await stepLogger.step(
       `Login user with username "${username}" and password "${password}"`,
       async () => {
-        const response = await requester.request(ENPOINT_KEY.LOGIN, {
+        const response = await requester.request(ENDPOINT_KEY.LOGIN, {
           data: new LoginUserRequest({ username, password }),
         });
 
@@ -53,7 +53,7 @@ export class UserSteps {
     token = token ?? (await this.ensureToken());
 
     return await stepLogger.step('Create account for user', async () => {
-      const response = await requester.request(ENPOINT_KEY.ACCOUNTS_CREATE, {
+      const response = await requester.request(ENDPOINT_KEY.ACCOUNTS_CREATE, {
         data: null,
         config: ApiConfig.getUserAuth(token),
       });
@@ -77,7 +77,7 @@ export class UserSteps {
     return await stepLogger.step(
       `Deposit amount "${depositAmount}" to account "${accountId}"`,
       async () => {
-        const response = await requester.request(ENPOINT_KEY.ACCOUNTS_DEPOSIT, {
+        const response = await requester.request(ENDPOINT_KEY.ACCOUNTS_DEPOSIT, {
           data: new AccountDepositRequest({
             id: accountId,
             balance: depositAmount,
@@ -114,7 +114,7 @@ export class UserSteps {
     token = token ?? (await this.ensureToken());
 
     return await stepLogger.step('Get customer accounts', async () => {
-      const response = await requester.request(ENPOINT_KEY.CUSTOMER_ACCOUNTS, {
+      const response = await requester.request(ENDPOINT_KEY.CUSTOMER_ACCOUNTS, {
         config: ApiConfig.getUserAuth(token),
       });
 
@@ -137,7 +137,7 @@ export class UserSteps {
     token = token ?? (await this.ensureToken());
 
     return await stepLogger.step('Get user profile data', async () => {
-      const { status, data } = await requester.request(ENPOINT_KEY.CUSTOMER_PROFILE_GET, {
+      const { status, data } = await requester.request(ENDPOINT_KEY.CUSTOMER_PROFILE_GET, {
         config: ApiConfig.getUserAuth(token),
       });
 
@@ -149,7 +149,7 @@ export class UserSteps {
     token = token ?? (await this.ensureToken());
 
     return await stepLogger.step(`Get transactions for account "${accountId}"`, async () => {
-      const { status, data } = await requester.request(ENPOINT_KEY.ACCOUNTS_TRANSACTIONS, {
+      const { status, data } = await requester.request(ENDPOINT_KEY.ACCOUNTS_TRANSACTIONS, {
         config: ApiConfig.getUserAuth(token),
         urlParam: accountId,
       });
@@ -157,5 +157,4 @@ export class UserSteps {
       return { status, data };
     });
   }
-
 }
