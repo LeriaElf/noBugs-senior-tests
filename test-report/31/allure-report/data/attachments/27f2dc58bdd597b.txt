@@ -1,0 +1,6 @@
+        ● Create user with username "sMxL" and password "OEOjwvs061&&"
+        → POST /admin/users (username: sMxL, password: OEOjwvs061&&, role: USER)
+        ← 201 CreateUserResponse
+        ● Login user with username "sMxL" and password "OEOjwvs061&&"
+        → POST /auth/login (username: sMxL, password: OEOjwvs061&&)
+        ← 200 LoginUserResponse
