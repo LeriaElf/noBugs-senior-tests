@@ -6,9 +6,10 @@
   "scripts": {
     "test": "npm run test:api && npm run test:ui",
     "pretest": "mkdir -p allure-results swagger-coverage/output",
-    "test:api": "mocha \"api/tests/**/*.js\" --config .mocharc.cjs",
+    "test:api": "mocha \"tests/api/tests/**/*.js\" --config .mocharc.cjs",
     "test:ui": "playwright test",
-    "test:api:watch": "mocha \"src/api/tests/**/*.test.js\" --config .mocharc.cjs --watch",
+    "test:ui:work": "playwright test --project=chromium-desktop --workers=1",
+    "test:api:watch": "mocha \"tests/api/tests/**/*.js\" --config .mocharc.cjs --watch",
     "test:ui:headed": "playwright test --headed",
     "test:ui:debug": "playwright test --debug",
     "allure": "allure generate allure-results --clean && allure open",

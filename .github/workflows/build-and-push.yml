@@ -2,7 +2,7 @@ name: Build and push Docker
 
 on:
   push:
-    paths: ['ui/**', 'api/**']
+    paths: ['ui/**', 'tests/**']
   workflow_dispatch:
 
 jobs:

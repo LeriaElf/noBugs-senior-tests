@@ -33,7 +33,7 @@ const projects = browsers.flatMap(browser =>
 );
 
 export default defineConfig({
-  testDir: './ui/tests',
+  testDir: './tests/ui/tests',
   timeout: 30_000,
   expect: { timeout: 5_000 },
   fullyParallel: true,
