@@ -1,0 +1,3 @@
+        ● Get all users
+        → GET /admin/users
+        ← 200 GetAllUsersResponse
