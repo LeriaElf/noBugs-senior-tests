@@ -1,0 +1,5 @@
+{
+  "method": "GET",
+  "url": "/accounts/4/transactions",
+  "body": null
+}

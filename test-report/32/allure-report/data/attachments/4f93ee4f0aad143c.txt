@@ -1,0 +1,8 @@
+        ● Create user with username "naP1" and password "LQAqxfk211%&"
+        → POST /admin/users (username: naP1, password: LQAqxfk211%&, role: USER)
+        ← 201 CreateUserResponse
+        ● Login user with username "naP1" and password "LQAqxfk211%&"
+        → POST /auth/login (username: naP1, password: LQAqxfk211%&)
+        ← 200 LoginUserResponse
+        → GET /customer/accounts
+        ← 200 CustomerAccountsResponse
