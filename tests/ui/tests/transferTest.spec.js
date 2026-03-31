@@ -25,12 +25,8 @@ test.describe('Transfer Service Tests', () => {
         await userDashboard.expectLoaded();
 
         const firstAccount = await userSession.steps.createAccount();
-        console.log(firstAccount, 'firstAccount');
-
         const firstDeposit = await userSession.steps.depositeToAccount(firstAccount.accountId);
         const secondAccount = await userSession.steps.createAccount();
-        console.log(secondAccount, 'secondAccount');
-
         const secondDeposit = await userSession.steps.depositeToAccount(secondAccount.accountId);
 
         return {

@@ -8,7 +8,7 @@
     "pretest": "mkdir -p allure-results swagger-coverage/output",
     "test:api": "mocha \"tests/api/tests/**/*.js\" --config .mocharc.cjs",
     "test:ui": "playwright test",
-    "test:ui:seq": "playwright test --project=chromium-macbook --workers=2",
+    "test:ui:seq": "playwright test --project=chromium-macbook --workers=1",
     "test:api:watch": "mocha \"tests/api/tests/**/*.js\" --config .mocharc.cjs --watch",
     "test:ui:headed": "playwright test --headed",
     "test:ui:debug": "playwright test --debug",
