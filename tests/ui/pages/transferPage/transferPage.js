@@ -1,12 +1,14 @@
-import { BasePage } from './basePage.js';
+import { BasePage } from '../basePage.js';
 import { expect } from '@playwright/test';
-import { URLS } from '../utils/urls.js';
-import { AccountForm } from './elements/accountForm.js';
+import { URLS } from '../../utils/urls.js';
+import { AccountForm } from '../elements/accountForm.js';
+import { TransactionsList } from '../transferPage/transactionsList/transactionsList.js';
 
 export class TransferPage extends BasePage {
   constructor(page) {
     super(page);
     this.accountForm = new AccountForm(page);
+    this.transactionList = new TransactionsList(this.page.locator('//div[./h3]'));
   }
 
   get url() {

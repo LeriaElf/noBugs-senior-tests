@@ -1,9 +1,10 @@
 import { compareModels } from './modelComparator.js';
 import { loadComparisonRules, getRuleFor } from './modelComparisonConfig.js';
+import { fileURLToPath } from 'url';
 
 export const assertThatModels = (request, response) => new ModelAssertions(request, response);
 
-const DEFAULT_CONFIG_PATH = 'api/config/modelRules.json';
+const DEFAULT_CONFIG_PATH = fileURLToPath(new URL('../../config/modelRules.json', import.meta.url));
 
 class ModelAssertions {
   constructor(request, response) {

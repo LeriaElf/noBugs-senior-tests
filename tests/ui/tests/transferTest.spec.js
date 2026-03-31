@@ -1,6 +1,6 @@
 import { test, expect } from '../fixtures/baseUi.js';
 import { UserDashboard } from '../pages/userDashboard.js';
-import { TransferPage } from '../pages/transferPage.js';
+import { TransferPage } from '../pages/transferPage/transferPage.js';
 import { BankAlert } from '../utils/bankAlert.js';
 import { URLS } from '../utils/urls.js';
 import { parseAlertAmount, parseAlertAccount } from '../utils/patterns.js';
@@ -25,8 +25,12 @@ test.describe('Transfer Service Tests', () => {
         await userDashboard.expectLoaded();
 
         const firstAccount = await userSession.steps.createAccount();
+        console.log(firstAccount, 'firstAccount');
+
         const firstDeposit = await userSession.steps.depositeToAccount(firstAccount.accountId);
         const secondAccount = await userSession.steps.createAccount();
+        console.log(secondAccount, 'secondAccount');
+
         const secondDeposit = await userSession.steps.depositeToAccount(secondAccount.accountId);
 
         return {
