@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "npm run test:api && npm run test:ui",
+    "test:db": "DOTENV_CONFIG_PATH=.env.db npm run test:api && npm run test:ui",
     "pretest": "mkdir -p allure-results swagger-coverage/output",
     "test:api": "mocha \"tests/api/tests/**/*.js\" --config .mocharc.cjs",
     "test:ui": "playwright test",
@@ -43,6 +44,7 @@
   },
   "dependencies": {
     "dotenv": "^17.2.3",
+    "pg": "^8.20.0",
     "randexp": "^0.5.3"
   },
   "engines": {

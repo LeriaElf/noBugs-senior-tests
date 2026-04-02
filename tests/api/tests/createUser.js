@@ -11,12 +11,18 @@ import { ADMIN_ERRORS, KEY_ERRORS, ROLE } from '../../utils/responseTitles.js';
 import { RequestSpecs } from '../../utils/requestSpecs.js';
 import { ResponseSpecs } from '../../utils/responseSpecs.js';
 import { ValidatedRequester } from '../../utils/validatedRequester.js';
+import { skipUnlessVersion } from '../../utils/apiVersion.js';
 
 describe('Admin Servise tests', function () {
   let userId;
   const adminAuth = RequestSpecs.withConfig(ApiConfig.adminAuth);
 
+  before(function () {
+    if (skipUnlessVersion('with_validation_fix')) this.skip();
+  });
+
   after(async () => {
+    if (!userId) return;
     await AdminSteps.deleteUser(userId);
   });
 
