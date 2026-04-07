@@ -1,0 +1,28 @@
+        ● Create user with username "kqjBvWC" and password "MIXzkwl649&&"
+        → POST /admin/users (username: kqjBvWC, password: MIXzkwl649&&, role: USER)
+        ← 201 CreateUserResponse
+        ● Login user with username "kqjBvWC" and password "MIXzkwl649&&"
+        → POST /auth/login (username: kqjBvWC, password: MIXzkwl649&&)
+        ← 200 LoginUserResponse
+        ● Create account for user
+        → POST /accounts
+        ← 201 CreateAccountResponse
+        ● Deposit amount "1327" to account "20"
+        → POST /accounts/deposit (id: 20, balance: 1327)
+        ← 200 AccountDepositResponse
+        ● Create user with username "yaC8COW2DkfaB" and password "TBRkoel560$&"
+        → POST /admin/users (username: yaC8COW2DkfaB, password: TBRkoel560$&, role: USER)
+        ← 201 CreateUserResponse
+        ● Login user with username "yaC8COW2DkfaB" and password "TBRkoel560$&"
+        → POST /auth/login (username: yaC8COW2DkfaB, password: TBRkoel560$&)
+        ← 200 LoginUserResponse
+        ● Create account for user
+        → POST /accounts
+        ← 201 CreateAccountResponse
+        ● Deposit amount "394.67" to account "21"
+        → POST /accounts/deposit (id: 21, balance: 394.67)
+        ← 200 AccountDepositResponse
+        → GET /customer/accounts
+        ← 200 CustomerAccountsResponse
+        → GET /customer/accounts
+        ← 200 CustomerAccountsResponse

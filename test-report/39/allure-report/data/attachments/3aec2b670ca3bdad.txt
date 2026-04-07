@@ -1,0 +1,10 @@
+        ● Create user with username "LdH69QGvfJi3FjY" and password "ZSCggrr228&$"
+        → POST /admin/users (username: LdH69QGvfJi3FjY, password: ZSCggrr228&$, role: USER)
+        ← 201 CreateUserResponse
+        ● Login user with username "LdH69QGvfJi3FjY" and password "ZSCggrr228&$"
+        → POST /auth/login (username: LdH69QGvfJi3FjY, password: ZSCggrr228&$)
+        ← 200 LoginUserResponse
+        → GET /customer/profile
+        ← 200 GetCustomerProfileResponse
+        → GET /customer/profile
+        ← 200 GetCustomerProfileResponse

@@ -1,0 +1,5 @@
+{
+  "method": "POST",
+  "url": "/accounts",
+  "body": null
+}
