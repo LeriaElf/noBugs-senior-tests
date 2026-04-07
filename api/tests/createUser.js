@@ -4,26 +4,44 @@ import { HTTP_STATUS } from '../utils/httpStatus.js';
 import { expect } from 'chai';
 import { errorHandlingRequester } from '../utils/errorHandlingRequester.js';
 import { ExpectedError } from '../models/expectedError.js';
-import { ENPOINT_KEY } from '../utils/enpoints.js';
+import { ENDPOINT_KEY } from '../utils/enpoints.js';
 import { CreateUserRequest } from '../models/createUserRequset.js';
 import { ApiConfig } from '../utils/apiConfig.js';
-import { ADMIN_ERRORS, KEY_ERRORS, ROLE } from '../utils/responseSpec.js';
+import { ADMIN_ERRORS, KEY_ERRORS, ROLE } from '../utils/responseTitles.js';
+import { RequestSpecs } from '../utils/requestSpecs.js';
+import { ResponseSpecs } from '../utils/responseSpecs.js';
+import { ValidatedRequester } from '../utils/validatedRequester.js';
 
 describe('Admin Servise tests', function () {
   let userId;
+  const adminAuth = RequestSpecs.withConfig(ApiConfig.adminAuth);
 
   after(async () => {
     await AdminSteps.deleteUser(userId);
   });
 
   it('Admin shoud be able to create new user', async () => {
-    const { requestData, responseData, status } = await AdminSteps.createUser();
-    userId = responseData.id;
+    const requestData = CreateUserRequest.generateUserData();
 
-    expect(status).to.equal(HTTP_STATUS.CREATED);
+    const { data: responseData } = await new ValidatedRequester(
+      adminAuth,
+      ENDPOINT_KEY.ADMIN_CREATE_USER,
+      ResponseSpecs.entityWasCreated(),
+    ).post({
+      data: requestData,
+      stepName: `Create user with username "${requestData.username}" and password "${requestData.password}"`,
+    });
+
+    userId = responseData.id;
     await assertThatModels(requestData, responseData).match();
 
-    const { users } = await AdminSteps.getAllUsers();
+    const { data } = await new ValidatedRequester(
+      adminAuth,
+      ENDPOINT_KEY.ADMIN_GET_ALL_USERS,
+      ResponseSpecs.okArrayBy('users'),
+    ).get({ stepName: 'Get all users' });
+
+    const { users } = data;
     expect(users.find(user => user.username === responseData.username)).to.exist;
   });
 
@@ -73,7 +91,7 @@ describe('Admin Servise tests', function () {
       const { users: usersBefore } = await AdminSteps.getAllUsers();
       const countBefore = usersBefore.length;
 
-      await errorHandlingRequester.requestExpectingError(ENPOINT_KEY.ADMIN_CREATE_USER, {
+      await errorHandlingRequester.requestExpectingError(ENDPOINT_KEY.ADMIN_CREATE_USER, {
         data: CreateUserRequest.generateUserData({ username, role }),
         config: ApiConfig.adminAuth,
         expectedError,
@@ -129,7 +147,7 @@ describe('Admin Servise tests', function () {
       const { users: usersBefore } = await AdminSteps.getAllUsers();
       const countBefore = usersBefore.length;
 
-      await errorHandlingRequester.requestExpectingError(ENPOINT_KEY.ADMIN_CREATE_USER, {
+      await errorHandlingRequester.requestExpectingError(ENDPOINT_KEY.ADMIN_CREATE_USER, {
         data: CreateUserRequest.generateUserData({ password, role }),
         config: ApiConfig.adminAuth,
         expectedError,

@@ -1,13 +1,15 @@
 import 'dotenv/config';
 import { expect } from 'chai';
 import { AdminSteps } from '../utils/steps/adminSteps.js';
-import { HTTP_STATUS } from '../utils/httpStatus.js';
-import { ENPOINT_KEY } from '../utils/enpoints.js';
-import { requester } from '../utils/requester.js';
+import { ENDPOINT_KEY } from '../utils/enpoints.js';
 import { LoginUserRequest } from '../models/loginUserRequest.js';
+import { RequestSpecs } from '../utils/requestSpecs.js';
+import { ResponseSpecs } from '../utils/responseSpecs.js';
+import { ValidatedRequester } from '../utils/validatedRequester.js';
 
 describe('Auth Servise tests', function () {
   let userId;
+  const unAuth = RequestSpecs.withConfig({});
 
   after(async () => {
     await AdminSteps.deleteUser(userId);
@@ -20,12 +22,15 @@ describe('Auth Servise tests', function () {
     const password = requestData.password;
     userId = responseData.id;
 
-    const { data, status, headers } = await requester.request(ENPOINT_KEY.LOGIN, {
+    const { data, headers } = await new ValidatedRequester(
+      unAuth,
+      ENDPOINT_KEY.LOGIN,
+      ResponseSpecs.okWithField('username'),
+    ).post({
       data: new LoginUserRequest({ username, password }),
       stepName: `Login as user "${username}"`,
     });
 
-    expect(status).to.equal(HTTP_STATUS.OK);
     expect(data.username).to.equal(username);
     expect(headers.authorization).to.exist;
   });
@@ -34,12 +39,15 @@ describe('Auth Servise tests', function () {
     const username = process.env.ADMIN_USERNAME;
     const password = process.env.ADMIN_PASSWORD;
 
-    const { status, headers } = await requester.request(ENPOINT_KEY.LOGIN, {
+    const { headers } = await new ValidatedRequester(
+      unAuth,
+      ENDPOINT_KEY.LOGIN,
+      ResponseSpecs.ok(),
+    ).post({
       data: new LoginUserRequest({ username, password }),
       stepName: `Login as admin "${username}"`,
     });
 
-    expect(status).to.equal(HTTP_STATUS.OK);
     expect(headers.authorization).to.equal(process.env.ADMIN_TOKEN);
   });
 });

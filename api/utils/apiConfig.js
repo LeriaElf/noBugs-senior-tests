@@ -1,4 +1,8 @@
 import 'dotenv/config';
+import { requester } from '../utils/requester.js';
+import { LoginUserRequest } from '../models/loginUserRequest.js';
+import { ENDPOINT_KEY } from '../utils/enpoints.js';
+import { HTTP_STATUS } from '../utils/httpStatus.js';
 
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
 
@@ -15,6 +19,13 @@ export class ApiConfig {
   }
 
   static get adminAuth() {
+    const rawToken = process.env.ADMIN_TOKEN;
+    if (!rawToken || rawToken === 'undefined') {
+      throw new Error(
+        'ADMIN_TOKEN env var is required (Basic token value without "Basic " prefix)',
+      );
+    }
+
     return {
       headers: {
         ...this.#defaultHeaders,
@@ -30,5 +41,26 @@ export class ApiConfig {
         Authorization: `${token}`,
       },
     };
+  }
+
+  static async authAsUser(userData = {}) {
+    const { username, password } = userData;
+    if (!username || !password) {
+      throw new Error('ApiConfig.authAsUser: username and password are required');
+    }
+
+    const { status, headers } = await requester.request(ENDPOINT_KEY.LOGIN, {
+      data: new LoginUserRequest({ username, password }),
+    });
+    if (status !== HTTP_STATUS.OK) {
+      throw new Error(`Login failed with status ${status}`);
+    }
+
+    const token = headers?.authorization;
+    if (!token) {
+      throw new Error('ApiConfig.authAsUser: Authorization header is missing');
+    }
+
+    return this.getUserAuth(token);
   }
 }

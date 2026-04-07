@@ -1,44 +1,45 @@
-import { AdminSteps } from '../utils/steps/adminSteps.js';
-import { HTTP_STATUS } from '../utils/httpStatus.js';
 import { expect } from 'chai';
-import { ENPOINT_KEY } from '../utils/enpoints.js';
-import { requester } from '../utils/requester.js';
-import { ApiConfig } from '../utils/apiConfig.js';
+import { ENDPOINT_KEY } from '../utils/enpoints.js';
 import { userSteps } from '../utils/fixtures.js';
+import { RequestSpecs } from '../utils/requestSpecs.js';
+import { ResponseSpecs } from '../utils/responseSpecs.js';
+import { ValidatedRequester } from '../utils/validatedRequester.js';
+import { UserSession } from '../utils/userSessionAnnotation.js';
 
 describe('Account Servise tests', function () {
-  let userId;
+  it(
+    'User shoud be able to create account',
+    UserSession({ amount: 1 })(async users => {
+      const [user] = users;
 
-  after(async () => {
-    await AdminSteps.deleteUser(userId);
-  });
+      const auth = RequestSpecs.authAsUserData(user);
+      const config = await auth.buildConfig();
+      const token = config.headers.Authorization;
 
-  it('User shoud be able to create account', async () => {
-    const { requestData, responseData } = await AdminSteps.createUser();
+      const { accounts: prevAccounts } = await userSteps.getCustomerAccaunts(token);
+      expect(prevAccounts.length).to.equal(0);
 
-    const username = requestData.username;
-    const password = requestData.password;
-    userId = responseData.id;
+      const { data: accountData } = await new ValidatedRequester(
+        auth,
+        ENDPOINT_KEY.ACCOUNTS_CREATE,
+        ResponseSpecs.entityWasCreated(),
+      ).post({ stepName: 'Create new account for user' });
 
-    const { status: loginStatus, token } = await userSteps.loginUser(username, password);
-    expect(loginStatus).to.equal(HTTP_STATUS.OK);
+      expect(accountData.accountNumber).to.exist;
 
-    const { accounts } = await userSteps.getCustomerAccaunts(token);
-    expect(accounts.length).to.equal(0);
+      const { data } = await new ValidatedRequester(
+        auth,
+        ENDPOINT_KEY.CUSTOMER_ACCOUNTS,
+        ResponseSpecs.okArrayBy('accounts'),
+      ).get({ stepName: 'Get users accounts' });
 
-    const { status: accountCreateStatus, data: accountCreateData } = await requester.request(
-      ENPOINT_KEY.ACCOUNTS_CREATE,
-      {
-        data: null,
-        config: ApiConfig.getUserAuth(token),
-        stepName: 'Create new account for user',
-      },
-    );
+      const createdFromList = data.accounts.find(
+        a => a.accountNumber === accountData.accountNumber,
+      );
+      expect(createdFromList, 'Created account must be present in accounts list').to.exist;
 
-    expect(accountCreateStatus).to.equal(HTTP_STATUS.CREATED);
-    expect(accountCreateData.accountNumber).to.exist;
-
-    const { accounts: newUserAccounts } = await userSteps.getCustomerAccaunts(token);
-    expect(newUserAccounts.length).to.equal(1);
-  });
+      expect(accountData.balance).to.equal(0);
+      expect(createdFromList.balance).to.equal(0);
+    }),
+  );
 });

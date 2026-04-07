@@ -1,12 +1,15 @@
 import axios from 'axios';
-import 'dotenv/config';
+import dotenv from 'dotenv';
 
+const dotenvPath = process.env.DOTENV_CONFIG_PATH || '.env';
+dotenv.config(dotenvPath ? { path: dotenvPath } : undefined);
 const baseURL = process.env.BASE_URL;
 
 export class HttpClient {
   constructor() {
     this.client = axios.create({
       baseURL: baseURL,
+      timeout: 10_000,
     });
   }
 

@@ -1,7 +1,7 @@
 import { CreateUserRequest } from '../../models/createUserRequset.js';
 import { requester } from '../requester.js';
 import { ApiConfig } from '../apiConfig.js';
-import { ENPOINT_KEY } from '../enpoints.js';
+import { ENDPOINT_KEY } from '../enpoints.js';
 import { stepLogger } from '../stepLogger.js';
 
 export class AdminSteps {
@@ -11,7 +11,7 @@ export class AdminSteps {
     return await stepLogger.step(
       `Create user with username "${userData.username}" and password "${userData.password}"`,
       async () => {
-        const response = await requester.request(ENPOINT_KEY.ADMIN_CREATE_USER, {
+        const response = await requester.request(ENDPOINT_KEY.ADMIN_CREATE_USER, {
           data: userData,
           config: ApiConfig.adminAuth,
         });
@@ -27,7 +27,7 @@ export class AdminSteps {
 
   static async getAllUsers() {
     return await stepLogger.step('Get all users', async () => {
-      const { data, status } = await requester.request(ENPOINT_KEY.ADMIN_GET_ALL_USERS, {
+      const { data, status } = await requester.request(ENDPOINT_KEY.ADMIN_GET_ALL_USERS, {
         config: ApiConfig.adminAuth,
       });
 
@@ -37,7 +37,7 @@ export class AdminSteps {
 
   static async deleteUser(userId) {
     return await stepLogger.step(`Delete user with id "${userId}"`, async () => {
-      return await requester.request(ENPOINT_KEY.ADMIN_DELETE_USER, {
+      return await requester.request(ENDPOINT_KEY.ADMIN_DELETE_USER, {
         config: ApiConfig.adminAuth,
         urlParam: userId,
       });

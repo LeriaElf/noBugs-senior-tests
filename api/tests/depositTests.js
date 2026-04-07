@@ -1,19 +1,22 @@
 import { expect } from 'chai';
 import { AdminSteps } from '../utils/steps/adminSteps.js';
 import { HTTP_STATUS } from '../utils/httpStatus.js';
-import { ENPOINT_KEY } from '../utils/enpoints.js';
-import { requester } from '../utils/requester.js';
+import { ENDPOINT_KEY } from '../utils/enpoints.js';
 import { ApiConfig } from '../utils/apiConfig.js';
 import { userSteps } from '../utils/fixtures.js';
 import { errorHandlingRequester } from '../utils/errorHandlingRequester.js';
 import { AccountDepositRequest } from '../models/accountDepositRequest.js';
 import { ExpectedError } from '../models/expectedError.js';
-import { DEPOSIT_RESPONSE_MESSAGES, DEPOSIT_ERRORS, KEY_ERRORS } from '../utils/responseSpec.js';
+import { DEPOSIT_RESPONSE_MESSAGES, DEPOSIT_ERRORS, KEY_ERRORS } from '../utils/responseTitles.js';
+import { RequestSpecs } from '../utils/requestSpecs.js';
+import { ResponseSpecs } from '../utils/responseSpecs.js';
+import { ValidatedRequester } from '../utils/validatedRequester.js';
 
 describe('Deposit Servise tests', function () {
   let token;
   let accountId;
   let userId;
+  let auth;
 
   before(async () => {
     const { requestData, responseData } = await AdminSteps.createUser();
@@ -21,6 +24,7 @@ describe('Deposit Servise tests', function () {
     const response = await userSteps.loginUser(requestData.username, requestData.password);
     token = response.token;
     userId = responseData.id;
+    auth = RequestSpecs.withConfig(ApiConfig.getUserAuth(token));
 
     const account = await userSteps.createAccount(token);
     accountId = account.accountId;
@@ -35,18 +39,17 @@ describe('Deposit Servise tests', function () {
 
   validAmount.forEach(amount => {
     it(`User shoud be able to deposit valid amount - ${amount} into the users's account`, async () => {
-      const { status: depositStatus, data: depositData } = await requester.request(
-        ENPOINT_KEY.ACCOUNTS_DEPOSIT,
-        {
+      const { data: depositData } = await new ValidatedRequester(
+        auth,
+        ENDPOINT_KEY.ACCOUNTS_DEPOSIT,
+        ResponseSpecs.okWithField('balance'),
+      ).post({
           data: new AccountDepositRequest({ id: accountId, balance: amount }),
-          config: ApiConfig.getUserAuth(token),
           stepName: `Deposit ${amount} to account ${accountId}`,
-        },
-      );
+        });
 
       accumulatedBalance += amount;
 
-      expect(depositStatus).to.equal(HTTP_STATUS.OK);
       expect(depositData.balance).to.equal(accumulatedBalance);
 
       const currentTransaction = depositData.transactions.find(t => t.amount === amount);
@@ -71,11 +74,11 @@ describe('Deposit Servise tests', function () {
       errorMessages: [DEPOSIT_RESPONSE_MESSAGES.UNAUTHORASED_ACCESS],
     });
 
-    await errorHandlingRequester.requestExpectingError(ENPOINT_KEY.ACCOUNTS_DEPOSIT, {
-      data: new AccountDepositRequest({ id: accountId + 100, balance }),
-      config: ApiConfig.getUserAuth(token),
-      expectedError,
-    });
+      await errorHandlingRequester.requestExpectingError(ENDPOINT_KEY.ACCOUNTS_DEPOSIT, {
+        data: new AccountDepositRequest({ id: accountId + 100, balance }),
+        config: ApiConfig.getUserAuth(token),
+        expectedError,
+      });
 
     const { accounts: newAccounts } = await userSteps.getCustomerAccaunts(token);
     expect(newAccounts[0].balance).to.equal(initialBalance);
@@ -98,7 +101,7 @@ describe('Deposit Servise tests', function () {
       const { accounts } = await userSteps.getCustomerAccaunts(token);
       const initialBalance = accounts[0].balance;
 
-      await errorHandlingRequester.requestExpectingError(ENPOINT_KEY.ACCOUNTS_DEPOSIT, {
+      await errorHandlingRequester.requestExpectingError(ENDPOINT_KEY.ACCOUNTS_DEPOSIT, {
         data: new AccountDepositRequest({ id: accountId, balance: amount }),
         config: ApiConfig.getUserAuth(token),
         expectedError,
@@ -119,7 +122,7 @@ describe('Deposit Servise tests', function () {
       errorMessages: [DEPOSIT_RESPONSE_MESSAGES.SERVER_ERROR],
     });
 
-    await errorHandlingRequester.requestExpectingError(ENPOINT_KEY.ACCOUNTS_DEPOSIT, {
+    await errorHandlingRequester.requestExpectingError(ENDPOINT_KEY.ACCOUNTS_DEPOSIT, {
       data: new AccountDepositRequest({ id: accountId, balance: '' }),
       config: ApiConfig.getUserAuth(token),
       expectedError,
