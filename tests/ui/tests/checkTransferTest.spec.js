@@ -43,7 +43,7 @@ test.describe('Transfer Service Tests', () => {
       const transferPage = new TransferPage(page);
       await transferPage.titleIsVisible();
 
-      await transferPage.accountForm.chooseAccount(firstAccount.accountNumber);
+      await transferPage.accountForm.chooseAccount(firstAccount.accountNumber, firstAccount.accountId);
       await transferPage.accountForm.fillRecipientName(userName);
       await transferPage.accountForm.fillRecipientAccount(secondAccount.accountNumber);
       await transferPage.accountForm.enterAmount(firstAccount.balance / 2);

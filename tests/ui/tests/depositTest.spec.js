@@ -5,12 +5,9 @@ import { BankAlert } from '../utils/bankAlert.js';
 import { URLS } from '../utils/urls.js';
 import { parseAlertAmount, parseAlertAccount } from '../utils/patterns.js';
 import { ApiConfig } from '../../utils/apiConfig.js';
-import { skipUnlessVersion } from '../../utils/apiVersion.js';
 import { getAccountByNumberFromBackend } from '../utils/backendState.js';
 
 test.describe('Deposit Servise Tests', () => {
-  test.skip(skipUnlessVersion('with_validation_fix'));
-
   test("@UserSession(amount=1); User shoud be able to deposit valid amount into the users's account", async ({
     page,
     userSession,
@@ -37,7 +34,7 @@ test.describe('Deposit Servise Tests', () => {
       await userDashboard.clickDepositMoneyButton();
 
       const depositMoneyPage = new DepositPage(page);
-      await depositMoneyPage.accountForm.chooseAccount(account.accountNumber);
+      await depositMoneyPage.accountForm.chooseAccount(account.accountNumber, account.accountId);
       const amount = await depositMoneyPage.accountForm.enterAmount();
 
       const alertMessage = await depositMoneyPage.checkAlertAndAccept(
@@ -79,7 +76,7 @@ test.describe('Deposit Servise Tests', () => {
         depositMoneyPage.clickDepositButton(),
       );
 
-      await depositMoneyPage.accountForm.chooseAccount(account.accountNumber);
+      await depositMoneyPage.accountForm.chooseAccount(account.accountNumber, account.accountId);
       await depositMoneyPage.accountForm.clearAmount();
 
       await depositMoneyPage.checkAlertAndAccept(BankAlert.DEPOSIT_VALID_AMOUNT, () =>
@@ -113,7 +110,7 @@ test.describe('Deposit Servise Tests', () => {
       await userDashboard.clickDepositMoneyButton();
 
       const depositMoneyPage = new DepositPage(page);
-      await depositMoneyPage.accountForm.chooseAccount(account.accountNumber);
+      await depositMoneyPage.accountForm.chooseAccount(account.accountNumber, account.accountId);
       await depositMoneyPage.accountForm.enterAmount('-100');
 
       await depositMoneyPage.checkAlertAndAccept(BankAlert.DEPOSIT_VALID_AMOUNT, () =>

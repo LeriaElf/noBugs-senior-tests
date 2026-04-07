@@ -7,12 +7,9 @@ import { parseAlertAmount, parseAlertAccount } from '../utils/patterns.js';
 import { generateNonExistentAccount } from '../utils/generateNonExistentAccount.js';
 import { setupSenderWithAccount } from '../../helpers/setupSenderWithAccount.js';
 import { ApiConfig } from '../../utils/apiConfig.js';
-import { skipUnlessVersion } from '../../utils/apiVersion.js';
 import { getAccountByNumberFromBackend } from '../utils/backendState.js';
 
 test.describe('Transfer Service Tests', () => {
-  test.skip(skipUnlessVersion('with_validation_fix'));
-
   test("@UserSession(amount=1); User should be able to transfer valid amount between user's accounts", async ({
     page,
     userSession,
@@ -44,7 +41,10 @@ test.describe('Transfer Service Tests', () => {
       const transferPage = new TransferPage(page);
       await transferPage.titleIsVisible();
 
-      await transferPage.accountForm.chooseAccount(firstAccount.accountNumber);
+      await transferPage.accountForm.chooseAccount(
+        firstAccount.accountNumber,
+        firstAccount.accountId,
+      );
       await transferPage.accountForm.fillRecipientName(userName);
       await transferPage.accountForm.fillRecipientAccount(secondAccount.accountNumber);
       await transferPage.accountForm.enterAmount(firstAccount.balance);
@@ -72,6 +72,7 @@ test.describe('Transfer Service Tests', () => {
       await page.reload();
       const visibleBalance = await transferPage.accountForm.getSelectedAccountBalance(
         secondAccount.accountNumber,
+        secondAccount.accountId,
       );
       expect(Number(visibleBalance)).toBe(firstAccount.balance + secondAccount.balance);
     });
@@ -115,7 +116,10 @@ test.describe('Transfer Service Tests', () => {
       const transferPage = new TransferPage(page);
       await transferPage.titleIsVisible();
 
-      await transferPage.accountForm.chooseAccount(senderAccount.accountNumber);
+      await transferPage.accountForm.chooseAccount(
+        senderAccount.accountNumber,
+        senderAccount.accountId,
+      );
       await transferPage.accountForm.fillRecipientName(recipientName);
       await transferPage.accountForm.fillRecipientAccount(recipientAccount.accountNumber);
       await transferPage.accountForm.enterAmount(senderAccount.balance);
@@ -169,7 +173,7 @@ test.describe('Transfer Service Tests', () => {
 
       await transferPage.titleIsVisible();
 
-      await transferPage.accountForm.chooseAccount(account.accountNumber);
+      await transferPage.accountForm.chooseAccount(account.accountNumber, account.accountId);
       await transferPage.accountForm.fillRecipientName(userName);
       await transferPage.accountForm.fillRecipientAccount(
         generateNonExistentAccount(account.accountNumber),
@@ -237,7 +241,7 @@ test.describe('Transfer Service Tests', () => {
 
       await transferPage.titleIsVisible();
 
-      await transferPage.accountForm.chooseAccount(account.accountNumber);
+      await transferPage.accountForm.chooseAccount(account.accountNumber, account.accountId);
       await transferPage.accountForm.fillRecipientName(userName);
       await transferPage.accountForm.fillRecipientAccount(account.accountNumber);
       await transferPage.accountForm.enterAmount('0');
@@ -278,7 +282,7 @@ test.describe('Transfer Service Tests', () => {
       const transferPage = new TransferPage(page);
       await transferPage.titleIsVisible();
 
-      await transferPage.accountForm.chooseAccount(account.accountNumber);
+      await transferPage.accountForm.chooseAccount(account.accountNumber, account.accountId);
       await transferPage.accountForm.fillRecipientName(userName);
       await transferPage.accountForm.fillRecipientAccount(account.accountNumber);
       await transferPage.accountForm.enterAmount(account.balance);

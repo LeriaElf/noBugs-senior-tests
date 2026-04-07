@@ -1,6 +1,7 @@
 import { expect } from '@playwright/test';
 import { AMOUNT_RE, ACCOUNT_RE } from '../../utils/patterns.js';
 import { AccountDepositRequest } from '../../../models/accountDepositRequest.js';
+import { isApiVersion } from '../../../utils/apiVersion.js';
 
 export class AccountForm {
   constructor(page) {
@@ -23,8 +24,12 @@ export class AccountForm {
     return this.page.getByPlaceholder('Enter recipient account number');
   }
 
-  async chooseAccount(accountNumber) {
-    const value = String(accountNumber).replace(/^ACC/i, '');
+  async chooseAccount(accountNumber, accountId = null) {
+    const value = isApiVersion('with_database')
+      ? String(accountId ?? accountNumber)
+      : String(accountNumber).replace(/^ACC/i, '');
+
+    console.log(value, 'value ---');
     await this.selectAccountOption.selectOption(value);
 
     return this;
@@ -43,9 +48,12 @@ export class AccountForm {
     return this;
   }
 
-  async getSelectedAccountBalance(accountNumber) {
-    const accountId = accountNumber.replace('ACC', '');
-    const text = await this.page.locator(`//option[@value="${accountId}"]`).textContent();
+  async getSelectedAccountBalance(accountNumber, accountId = null) {
+    const optionValue = isApiVersion('with_database')
+      ? String(accountId ?? accountNumber)
+      : String(accountNumber).replace(/^ACC/i, '');
+
+    const text = await this.page.locator(`//option[@value="${optionValue}"]`).textContent();
     expect(text.match(ACCOUNT_RE)[1]).toBe(accountNumber);
 
     return text.match(AMOUNT_RE)?.[1];
