@@ -18,6 +18,10 @@ export async function fetchAll(sql, params = []) {
   return rows;
 }
 
+export async function execute(sql, params = []) {
+  return await pool.query(sql, params);
+}
+
 export async function closePool() {
   await pool.end();
 }

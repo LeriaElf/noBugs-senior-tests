@@ -18,7 +18,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   backend:
-    image: nobugsme/nbank:with_database
+    image: nobugsme/nbank:with_database_with_fix
     environment:
       ADMIN_USERNAME: admin
       ADMIN_PASSWORD: admin

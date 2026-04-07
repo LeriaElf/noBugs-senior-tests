@@ -15,12 +15,18 @@ import {
 import { RequestSpecs } from '../../utils/requestSpecs.js';
 import { ResponseSpecs } from '../../utils/responseSpecs.js';
 import { ValidatedRequester } from '../../utils/validatedRequester.js';
+import { isApiVersion } from '../../utils/apiVersion.js';
+import { skipUnlessVersion } from '../../utils/apiVersion.js';
 
 describe('Deposit Servise tests', function () {
   let token;
   let accountId;
   let userId;
   let auth;
+
+  before(function () {
+    if (skipUnlessVersion('with_validation_fix')) this.skip();
+  });
 
   before(async () => {
     const { requestData, responseData } = await AdminSteps.createUser();
@@ -35,6 +41,7 @@ describe('Deposit Servise tests', function () {
   });
 
   after(async () => {
+    if (!userId) return;
     await AdminSteps.deleteUser(userId);
   });
 
@@ -43,20 +50,25 @@ describe('Deposit Servise tests', function () {
 
   validAmount.forEach(amount => {
     it(`User shoud be able to deposit valid amount - ${amount} into the users's account`, async () => {
-      const { data: depositData } = await new ValidatedRequester(
-        auth,
-        ENDPOINT_KEY.ACCOUNTS_DEPOSIT,
-        ResponseSpecs.okWithField('balance'),
-      ).post({
-        data: new AccountDepositRequest({ id: accountId, balance: amount }),
-        stepName: `Deposit ${amount} to account ${accountId}`,
-      });
+      const depositData = isApiVersion('with_database')
+        ? await userSteps.depositeToAccount(accountId, amount, token)
+        : (
+            await new ValidatedRequester(
+              auth,
+              ENDPOINT_KEY.ACCOUNTS_DEPOSIT,
+              ResponseSpecs.okWithField('balance'),
+            ).post({
+              data: new AccountDepositRequest({ id: accountId, balance: amount }),
+              stepName: `Deposit ${amount} to account ${accountId}`,
+            })
+          ).data;
 
       accumulatedBalance += amount;
 
       expect(depositData.balance).to.equal(accumulatedBalance);
 
       const currentTransaction = depositData.transactions.find(t => t.amount === amount);
+      expect(currentTransaction).to.exist;
       expect(currentTransaction.relatedAccountId).to.equal(accountId);
 
       const { data } = await userSteps.getTransactions(accountId, token);

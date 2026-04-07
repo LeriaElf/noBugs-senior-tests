@@ -30,6 +30,9 @@ export class HttpClient {
     try {
       return await this.client.post(url, data, config);
     } catch (error) {
+      if (!error.response) {
+        throw error;
+      }
       throw {
         message: `Request failed with status code ${error.response.status}`,
         response: error.response,
@@ -41,6 +44,9 @@ export class HttpClient {
     try {
       return await this.client.put(url, data, config);
     } catch (error) {
+      if (!error.response) {
+        throw error;
+      }
       throw {
         message: `Request failed with status code ${error.response.status}`,
         response: error.response,
@@ -52,6 +58,9 @@ export class HttpClient {
     try {
       return await this.client.delete(url, config);
     } catch (error) {
+      if (!error.response) {
+        throw error;
+      }
       throw {
         message: `Request failed with status code ${error.response.status}`,
         response: error.response,

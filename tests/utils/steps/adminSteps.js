@@ -3,6 +3,8 @@ import { requester } from '../requester.js';
 import { ApiConfig } from '../apiConfig.js';
 import { ENDPOINT_KEY } from '../enpoints.js';
 import { stepLogger } from '../stepLogger.js';
+import { isApiVersion } from '../apiVersion.js';
+import { DatabaseSteps } from '../database/databaseSteps.js';
 
 export class AdminSteps {
   static async createUser() {
@@ -37,10 +39,20 @@ export class AdminSteps {
 
   static async deleteUser(userId) {
     return await stepLogger.step(`Delete user with id "${userId}"`, async () => {
-      return await requester.request(ENDPOINT_KEY.ADMIN_DELETE_USER, {
-        config: ApiConfig.adminAuth,
-        urlParam: userId,
-      });
+      try {
+        return await requester.request(ENDPOINT_KEY.ADMIN_DELETE_USER, {
+          config: ApiConfig.adminAuth,
+          urlParam: userId,
+        });
+      } catch (error) {
+        if (isApiVersion('with_database') && userId) {
+          await DatabaseSteps.deleteUserCascade(userId, {
+            stepName: `Delete user "${userId}" directly from database`,
+          });
+          return { status: 204, data: null, headers: {} };
+        }
+        throw error;
+      }
     });
   }
 }

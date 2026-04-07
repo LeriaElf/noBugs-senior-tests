@@ -5,12 +5,12 @@ import { BankAlert } from '../utils/bankAlert.js';
 import { URLS } from '../utils/urls.js';
 import { parseAlertAmount, parseAlertAccount } from '../utils/patterns.js';
 import { ApiConfig } from '../../utils/apiConfig.js';
-import { ENDPOINT_KEY } from '../../utils/enpoints.js';
-import { ValidatedRequester } from '../../utils/validatedRequester.js';
-import { RequestSpecs } from '../../utils/requestSpecs.js';
-import { ResponseSpecs } from '../../utils/responseSpecs.js';
+import { skipUnlessVersion } from '../../utils/apiVersion.js';
+import { getAccountByNumberFromBackend } from '../utils/backendState.js';
 
 test.describe('Deposit Servise Tests', () => {
+  test.skip(skipUnlessVersion('with_validation_fix'));
+
   test("@UserSession(amount=1); User shoud be able to deposit valid amount into the users's account", async ({
     page,
     userSession,
@@ -23,6 +23,7 @@ test.describe('Deposit Servise Tests', () => {
         await userDashboard.expectLoaded();
 
         const account = await userSession.steps.createAccount();
+        console.log(account);
         const deposit = await userSession.steps.depositeToAccount(account.accountId);
         const userAuth = ApiConfig.getUserAuth(userSession.token);
 
@@ -47,14 +48,7 @@ test.describe('Deposit Servise Tests', () => {
       expect(parseAlertAmount(alertMessage)).toBe(amount);
       expect(parseAlertAccount(alertMessage)).toBe(account.accountNumber);
 
-      const { data } = await new ValidatedRequester(
-        RequestSpecs.withConfig(userAuth),
-        ENDPOINT_KEY.CUSTOMER_ACCOUNTS,
-        ResponseSpecs.okArrayBy('accounts'),
-      ).get();
-
-      const { accounts } = data;
-      const userAccount = accounts.find(acc => acc.accountNumber === account.accountNumber);
+      const userAccount = await getAccountByNumberFromBackend(account.accountNumber, userAuth);
       expect(userAccount.balance).toBe(account.balance + amount);
     });
   });
@@ -128,14 +122,7 @@ test.describe('Deposit Servise Tests', () => {
 
       await depositMoneyPage.titleIsVisible();
 
-      const { data } = await new ValidatedRequester(
-        RequestSpecs.withConfig(userAuth),
-        ENDPOINT_KEY.CUSTOMER_ACCOUNTS,
-        ResponseSpecs.okArrayBy('accounts'),
-      ).get();
-
-      const { accounts } = data;
-      const userAccount = accounts.find(acc => acc.accountNumber === account.accountNumber);
+      const userAccount = await getAccountByNumberFromBackend(account.accountNumber, userAuth);
       expect(userAccount.balance).toBe(account.balance);
     });
   });

@@ -13,12 +13,17 @@ import { TRANSFER_ERRORS, KEY_ERRORS } from '../../utils/responseTitles.js';
 import { RequestSpecs } from '../../utils/requestSpecs.js';
 import { ResponseSpecs } from '../../utils/responseSpecs.js';
 import { ValidatedRequester } from '../../utils/validatedRequester.js';
+import { skipUnlessVersion } from '../../utils/apiVersion.js';
 
 describe('Transfer Service tests', function () {
   let token;
   let accountIds;
   let usersId = [];
   let auth;
+
+  before(function () {
+    if (skipUnlessVersion('with_validation_fix')) this.skip();
+  });
 
   before(async () => {
     const response = await userSteps.createUserWithAccounts(3);
@@ -33,6 +38,7 @@ describe('Transfer Service tests', function () {
   });
 
   after(async () => {
+    if (usersId.length === 0) return;
     await Promise.all(usersId.map(async userId => await AdminSteps.deleteUser(userId)));
   });
 

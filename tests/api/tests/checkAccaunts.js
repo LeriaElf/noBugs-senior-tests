@@ -13,9 +13,11 @@ describe('Account Servise tests', function () {
   let userId;
   let auth;
 
-  before(async function () {
-    if (skipUnlessVersion('with_validation_fix')) await this.skip();
+  before(function () {
+    if (skipUnlessVersion('with_validation_fix')) this.skip();
+  });
 
+  before(async function () {
     const response = await userSteps.createUserWithAccounts();
     token = response.token;
     userId = response.userId;
