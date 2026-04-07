@@ -1,0 +1,9 @@
+{
+  "method": "POST",
+  "url": "/admin/users",
+  "body": {
+    "username": "W6DB",
+    "password": "VSMjvdp120%$",
+    "role": "USER"
+  }
+}

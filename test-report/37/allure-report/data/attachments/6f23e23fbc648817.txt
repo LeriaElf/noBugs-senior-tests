@@ -1,0 +1,6 @@
+        ● Create user with username "W6DB" and password "VSMjvdp120%$"
+        → POST /admin/users (username: W6DB, password: VSMjvdp120%$, role: USER)
+        ← 201 CreateUserResponse
+        ● Login user with username "W6DB" and password "VSMjvdp120%$"
+        → POST /auth/login (username: W6DB, password: VSMjvdp120%$)
+        ← 200 LoginUserResponse
