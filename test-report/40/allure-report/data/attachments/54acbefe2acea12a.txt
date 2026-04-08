@@ -1,0 +1,28 @@
+        ● Create user with username "vuX" and password "WYTfphc108&&"
+        → POST /admin/users (username: vuX, password: WYTfphc108&&, role: USER)
+        ← 201 CreateUserResponse
+        ● Login user with username "vuX" and password "WYTfphc108&&"
+        → POST /auth/login (username: vuX, password: WYTfphc108&&)
+        ← 200 LoginUserResponse
+        ● Create account for user
+        → POST /accounts
+        ← 201 CreateAccountResponse
+        ● Deposit amount "553.19" to account "24"
+        → POST /accounts/deposit (id: 24, balance: 553.19)
+        ← 200 AccountDepositResponse
+        ● Create user with username "bp6WPGa4" and password "TNRcntw031%&"
+        → POST /admin/users (username: bp6WPGa4, password: TNRcntw031%&, role: USER)
+        ← 201 CreateUserResponse
+        ● Login user with username "bp6WPGa4" and password "TNRcntw031%&"
+        → POST /auth/login (username: bp6WPGa4, password: TNRcntw031%&)
+        ← 200 LoginUserResponse
+        ● Create account for user
+        → POST /accounts
+        ← 201 CreateAccountResponse
+        ● Deposit amount "1550" to account "25"
+        → POST /accounts/deposit (id: 25, balance: 1550)
+        ← 200 AccountDepositResponse
+        → GET /customer/accounts
+        ← 200 CustomerAccountsResponse
+        → GET /customer/accounts
+        ← 200 CustomerAccountsResponse

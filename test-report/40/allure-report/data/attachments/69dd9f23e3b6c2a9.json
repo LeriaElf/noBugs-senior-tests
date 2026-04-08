@@ -1,0 +1,5 @@
+{
+  "method": "DELETE",
+  "url": "/admin/users/12",
+  "body": null
+}

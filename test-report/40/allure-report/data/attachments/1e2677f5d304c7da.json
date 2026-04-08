@@ -1,0 +1,9 @@
+{
+  "method": "POST",
+  "url": "/admin/users",
+  "body": {
+    "username": "vuX",
+    "password": "WYTfphc108&&",
+    "role": "USER"
+  }
+}
