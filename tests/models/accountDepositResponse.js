@@ -9,8 +9,8 @@ export class AccountDepositResponse extends BaseModel {
       return;
     }
 
-    const { id, accountNumber, balance, transactions = [] } = data;
-    super({ id, accountNumber, balance });
+    const { id, accountNumber, balance, depositAmount, transactionId, transactions = [] } = data;
+    super({ id, accountNumber, balance, depositAmount, transactionId });
     this.transactions = transactions.map(
       t => new Transaction({ ...t, relatedAccountId: t.relatedAccountId ?? t.accountId ?? id }),
     );

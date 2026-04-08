@@ -52,7 +52,18 @@ export const loginUserResponseSchema = {
 };
 
 export const createAccountResponseSchema = {
-  ...accountSchema,
+  type: 'object',
+  required: ['id', 'accountNumber', 'balance'],
+  properties: {
+    id: { type: 'integer' },
+    accountNumber: { type: 'string' },
+    balance: { type: 'number' },
+    transactions: {
+      type: 'array',
+      items: transactionSchema,
+    },
+  },
+  additionalProperties: true,
 };
 
 export const accountDepositResponseSchema = {
@@ -66,16 +77,38 @@ export const accountDepositResponseSchema = {
   ],
 };
 
+export const depositResponseSchema = {
+  type: 'object',
+  required: ['id', 'accountNumber', 'balance'],
+  properties: {
+    id: { type: 'integer' },
+    accountNumber: { type: 'string' },
+    balance: { type: 'number' },
+    depositAmount: { type: 'number' },
+    transactionId: { type: 'integer' },
+    transactions: {
+      type: 'array',
+      items: transactionSchema,
+    },
+  },
+  additionalProperties: true,
+};
+
 export const accountTransferResponseSchema = {
   type: 'object',
   required: ['receiverAccountId', 'senderAccountId', 'message', 'amount'],
   properties: {
+    status: { type: 'string' },
     receiverAccountId: { type: 'integer' },
     senderAccountId: { type: 'integer' },
     message: { type: 'string' },
     amount: { type: 'number' },
+    fraudRiskScore: { type: 'number' },
+    fraudReason: { type: 'string' },
+    requiresManualReview: { type: 'boolean' },
+    requiresVerification: { type: 'boolean' },
   },
-  additionalProperties: false,
+  additionalProperties: true,
 };
 
 export const getCustomerProfileResponseSchema = {
@@ -130,6 +163,7 @@ export const responseSchemaMap = {
   LoginUserResponse: loginUserResponseSchema,
   CreateAccountResponse: createAccountResponseSchema,
   AccountDepositResponse: accountDepositResponseSchema,
+  DepositResponse: depositResponseSchema,
   AccountTransferResponse: accountTransferResponseSchema,
   GetCustomerProfileResponse: getCustomerProfileResponseSchema,
   PutCustomerProfileResponse: putCustomerProfileResponseSchema,

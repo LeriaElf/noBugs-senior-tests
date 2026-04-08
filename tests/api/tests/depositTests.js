@@ -58,7 +58,7 @@ describe('Deposit Servise tests', function () {
               ENDPOINT_KEY.ACCOUNTS_DEPOSIT,
               ResponseSpecs.okWithField('balance'),
             ).post({
-              data: new AccountDepositRequest({ id: accountId, balance: amount }),
+              data: new AccountDepositRequest({ accountId, amount }),
               stepName: `Deposit ${amount} to account ${accountId}`,
             })
           ).data;
@@ -91,7 +91,7 @@ describe('Deposit Servise tests', function () {
     });
 
     await errorHandlingRequester.requestExpectingError(ENDPOINT_KEY.ACCOUNTS_DEPOSIT, {
-      data: new AccountDepositRequest({ id: accountId + 100, balance }),
+      data: new AccountDepositRequest({ accountId: accountId + 100, amount: balance }),
       config: ApiConfig.getUserAuth(token),
       expectedError,
     });
@@ -118,7 +118,7 @@ describe('Deposit Servise tests', function () {
       const initialBalance = accounts[0].balance;
 
       await errorHandlingRequester.requestExpectingError(ENDPOINT_KEY.ACCOUNTS_DEPOSIT, {
-        data: new AccountDepositRequest({ id: accountId, balance: amount }),
+        data: new AccountDepositRequest({ accountId, amount }),
         config: ApiConfig.getUserAuth(token),
         expectedError,
       });
@@ -139,7 +139,7 @@ describe('Deposit Servise tests', function () {
     });
 
     await errorHandlingRequester.requestExpectingError(ENDPOINT_KEY.ACCOUNTS_DEPOSIT, {
-      data: new AccountDepositRequest({ id: accountId, balance: '' }),
+      data: new AccountDepositRequest({ accountId, amount: '' }),
       config: ApiConfig.getUserAuth(token),
       expectedError,
     });

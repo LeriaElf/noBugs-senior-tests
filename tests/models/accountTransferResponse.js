@@ -1,7 +1,27 @@
 import { BaseModel } from './baseModel.js';
 
 export class AccountTransferResponse extends BaseModel {
-  constructor({ receiverAccountId, senderAccountId, message, amount }) {
-    super({ receiverAccountId, senderAccountId, message, amount });
+  constructor({
+    status,
+    receiverAccountId,
+    senderAccountId,
+    message,
+    amount,
+    fraudRiskScore,
+    fraudReason,
+    requiresManualReview,
+    requiresVerification,
+  }) {
+    super({
+      status,
+      receiverAccountId,
+      senderAccountId,
+      message,
+      amount,
+      fraudRiskScore,
+      fraudReason,
+      requiresManualReview,
+      requiresVerification,
+    });
   }
 }
