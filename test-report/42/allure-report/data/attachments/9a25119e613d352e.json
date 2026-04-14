@@ -1,0 +1,4 @@
+{
+  "status": 400,
+  "messages": "Invalid transfer: insufficient funds or invalid accounts"
+}
