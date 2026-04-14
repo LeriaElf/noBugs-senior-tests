@@ -1,0 +1,8 @@
+        ● Create user with username "DCSLc" and password "GMFnfti241&%"
+        → POST /admin/users (username: DCSLc, password: GMFnfti241&%, role: USER)
+        ← 201 CreateUserResponse
+        ● Login user with username "DCSLc" and password "GMFnfti241&%"
+        → POST /auth/login (username: DCSLc, password: GMFnfti241&%)
+        ← 200 LoginUserResponse
+        → GET /customer/accounts
+        ← 200 CustomerAccountsResponse

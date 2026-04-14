@@ -1,0 +1,9 @@
+{
+  "status": 404,
+  "messages": {
+    "timestamp": "2026-04-14T08:03:21.170+00:00",
+    "status": 404,
+    "error": "Not Found",
+    "path": "/api/v1/accounts/transfer-with-fraud-check"
+  }
+}

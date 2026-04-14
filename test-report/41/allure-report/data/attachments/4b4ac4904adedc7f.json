@@ -1,0 +1,9 @@
+{
+  "method": "POST",
+  "url": "/accounts/transfer-with-fraud-check",
+  "body": {
+    "senderAccountId": 18,
+    "receiverAccountId": 19,
+    "amount": 1284.95
+  }
+}
