@@ -1,0 +1,5 @@
+{
+  "method": "GET",
+  "url": "/customer/profile",
+  "body": null
+}
