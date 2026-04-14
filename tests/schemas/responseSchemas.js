@@ -14,7 +14,7 @@ const transactionSchema = {
 
 const accountSchema = {
   type: 'object',
-  required: ['id', 'accountNumber', 'balance', 'transactions'],
+  required: ['id', 'accountNumber', 'balance'],
   properties: {
     id: { type: 'integer' },
     accountNumber: { type: 'string' },

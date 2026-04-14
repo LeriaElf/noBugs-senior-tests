@@ -3,7 +3,6 @@ import { ApiConfig } from '../apiConfig.js';
 import { ENDPOINT_KEY } from '../enpoints.js';
 import { LoginUserRequest } from '../../models/loginUserRequest.js';
 import { AccountDepositRequest } from '../../models/accountDepositRequest.js';
-import { AccountTransferRequest } from '../../models/accountTransferRequest.js';
 import { AdminSteps } from './adminSteps.js';
 import { HTTP_STATUS } from '../httpStatus.js';
 import { stepLogger } from '../stepLogger.js';
@@ -115,29 +114,6 @@ export class UserSteps {
           status: response.status,
           balance: response.data.balance,
           transactions: response.data.transactions,
-        };
-      },
-    );
-  }
-
-  async transferWithFraudCheck(senderAccountId, receiverAccountId, amount, token) {
-    token = token ?? (await this.ensureToken());
-
-    return await stepLogger.step(
-      `Transfer amount "${amount}" with fraud check from account "${senderAccountId}" to account "${receiverAccountId}"`,
-      async () => {
-        const response = await requester.request(ENDPOINT_KEY.TRANSFER_WITH_FRAUD_CHECK, {
-          data: new AccountTransferRequest({
-            senderAccountId,
-            receiverAccountId,
-            amount,
-          }),
-          config: ApiConfig.getUserAuth(token),
-        });
-
-        return {
-          status: response.status,
-          data: response.data,
         };
       },
     );
