@@ -8,9 +8,12 @@ import { UserSession } from '../../utils/userSessionAnnotation.js';
 import { skipUnlessVersion } from '../../utils/apiVersion.js';
 import { assertThatModels } from '../../models/comparison/modelAssertions.js';
 import { DatabaseSteps } from '../../utils/database/databaseSteps.js';
-import { requester } from '../../utils/requester.js';
 import { ApiConfig } from '../../utils/apiConfig.js';
 import { HTTP_STATUS } from '../../utils/httpStatus.js';
+import { errorHandlingRequester } from '../../utils/errorHandlingRequester.js';
+import { ExpectedError } from '../../models/expectedError.js';
+import { ADMIN_ERRORS, KEY_ERRORS } from '../../utils/responseTitles.js';
+import { CreateUserRequest } from '../../models/createUserRequset.js';
 
 describe('Account Servise tests', function () {
   before(function () {
@@ -48,21 +51,22 @@ describe('Account Servise tests', function () {
   );
 
   it('Invalid username should not create user in DB', async function () {
-    const invalidUser = { username: 'ab', password: 'ValidPass123$$', role: 'USER' };
+    const invalidUserName = 'ab';
 
-    try {
-      await requester.request('ADMIN_CREATE_USER', {
-        data: invalidUser,
-        config: ApiConfig.adminAuth,
-        stepName: `Try to create user with invalid username "${invalidUser.username}"`,
-      });
-      throw new Error('Expected create user request to fail with 400, but it succeeded');
-    } catch (error) {
-      expect(error.response?.status).to.equal(HTTP_STATUS.BAD_REQUEST);
-    }
+    const expectedError = new ExpectedError({
+      statusCode: HTTP_STATUS.BAD_REQUEST,
+      errorKey: KEY_ERRORS.USERNAME,
+      errorMessages: [ADMIN_ERRORS.NAME_LENGTH],
+    });
 
-    const userDao = await DatabaseSteps.findUserByUsername(invalidUser.username, {
-      stepName: `Verify user "${invalidUser.username}" was not created in database`,
+    await errorHandlingRequester.requestExpectingError(ENDPOINT_KEY.ADMIN_CREATE_USER, {
+      data: CreateUserRequest.generateUserData({ username: invalidUserName }),
+      config: ApiConfig.adminAuth,
+      expectedError,
+    });
+
+    const userDao = await DatabaseSteps.findUserByUsername(invalidUserName, {
+      stepName: `Verify user "${invalidUserName}" was not created in database`,
     });
     expect(userDao).to.be.null;
   });
