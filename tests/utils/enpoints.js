@@ -3,6 +3,7 @@ import { AccountTransferResponse } from '../models/accountTransferResponse.js';
 import { AccountTransferRequest } from '../models/accountTransferRequest.js';
 import { AccountDepositRequest } from '../models/accountDepositRequest.js';
 import { AccountDepositResponse } from '../models/accountDepositResponse.js';
+import { DepositResponse } from '../models/depositResponse.js';
 import { CreateAccountResponse } from '../models/createAccountResponse.js';
 import { CreateUserRequest } from '../models/createUserRequset.js';
 import { CreateUserResponse } from '../models/createUserResponse.js';
@@ -25,10 +26,12 @@ export const ENDPOINT_KEY = {
   ACCOUNTS_CREATE: 'ACCOUNTS_CREATE',
   ACCOUNTS_TRANSFER: 'ACCOUNTS_TRANSFER',
   ACCOUNTS_DEPOSIT: 'ACCOUNTS_DEPOSIT',
+  ACCOUNTS_DEPOSIT_FRAUD: 'ACCOUNTS_DEPOSIT_FRAUD',
   ACCOUNTS_TRANSACTIONS: 'ACCOUNTS_TRANSACTIONS',
   CUSTOMER_PROFILE_GET: 'CUSTOMER_PROFILE_GET',
   CUSTOMER_PROFILE_PUT: 'CUSTOMER_PROFILE_PUT',
   CUSTOMER_ACCOUNTS: 'CUSTOMER_ACCOUNTS',
+  TRANSFER_WITH_FRAUD_CHECK: 'TRANSFER_WITH_FRAUD_CHECK',
 };
 
 export const endpoints = {
@@ -75,6 +78,12 @@ export const endpoints = {
     requestModel: AccountDepositRequest,
     responseModel: AccountDepositResponse,
   },
+  [ENDPOINT_KEY.ACCOUNTS_DEPOSIT_FRAUD]: {
+    url: '/accounts/deposit',
+    method: 'post',
+    requestModel: AccountDepositRequest,
+    responseModel: DepositResponse,
+  },
   [ENDPOINT_KEY.ACCOUNTS_TRANSACTIONS]: {
     url: accountId => `/accounts/${accountId}/transactions`,
     templateUrl: '/accounts/{accountId}/transactions',
@@ -99,5 +108,11 @@ export const endpoints = {
     method: 'get',
     requestModel: BaseModel,
     responseModel: CustomerAccountsResponse,
+  },
+  [ENDPOINT_KEY.TRANSFER_WITH_FRAUD_CHECK]: {
+    url: '/accounts/transfer-with-fraud-check',
+    method: 'post',
+    requestModel: AccountTransferRequest,
+    responseModel: AccountTransferResponse,
   },
 };

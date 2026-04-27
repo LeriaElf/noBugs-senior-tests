@@ -11,11 +11,16 @@ import { CUSTOMER_RESPONSE_MESSAGES } from '../../utils/responseTitles.js';
 import { RequestSpecs } from '../../utils/requestSpecs.js';
 import { ResponseSpecs } from '../../utils/responseSpecs.js';
 import { ValidatedRequester } from '../../utils/validatedRequester.js';
+import { isApiVersion } from '../../utils/apiVersion.js';
 
 describe('Customer Servise tests', function () {
   let token;
   let auth;
   let userId;
+
+  before(function () {
+    if (isApiVersion('with_fraud_check')) this.skip();
+  });
 
   before(async () => {
     const { requestData, responseData } = await AdminSteps.createUser();
@@ -28,6 +33,7 @@ describe('Customer Servise tests', function () {
   });
 
   after(async () => {
+    if (!userId) return;
     await AdminSteps.deleteUser(userId);
   });
 

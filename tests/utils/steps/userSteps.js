@@ -80,8 +80,8 @@ export class UserSteps {
       async () => {
         if (isApiVersion('with_database')) {
           const data = new AccountDepositRequest({
-            id: accountId,
-            balance: depositAmount,
+            accountId,
+            amount: depositAmount,
           });
 
           await stepLogger.request('post', '/accounts/deposit', data.toJson());
@@ -104,8 +104,8 @@ export class UserSteps {
 
         const response = await requester.request(ENDPOINT_KEY.ACCOUNTS_DEPOSIT, {
           data: new AccountDepositRequest({
-            id: accountId,
-            balance: depositAmount,
+            accountId,
+            amount: depositAmount,
           }),
           config: ApiConfig.getUserAuth(token),
         });
