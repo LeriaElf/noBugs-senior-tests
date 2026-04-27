@@ -8,8 +8,11 @@ import { ENDPOINT_KEY } from '../../utils/enpoints.js';
 import { ValidatedRequester } from '../../utils/validatedRequester.js';
 import { RequestSpecs } from '../../utils/requestSpecs.js';
 import { ResponseSpecs } from '../../utils/responseSpecs.js';
+import { skipUnlessVersion } from '../../utils/apiVersion.js';
 
 test.describe('Transfer Service Tests', () => {
+  test.skip(skipUnlessVersion('with_validation_fix'));
+
   test('@UserSession(amount=1); User should be able to find all his transactions', async ({
     page,
     userSession,
@@ -40,7 +43,7 @@ test.describe('Transfer Service Tests', () => {
       const transferPage = new TransferPage(page);
       await transferPage.titleIsVisible();
 
-      await transferPage.accountForm.chooseAccount(firstAccount.accountNumber);
+      await transferPage.accountForm.chooseAccount(firstAccount.accountNumber, firstAccount.accountId);
       await transferPage.accountForm.fillRecipientName(userName);
       await transferPage.accountForm.fillRecipientAccount(secondAccount.accountNumber);
       await transferPage.accountForm.enterAmount(firstAccount.balance / 2);

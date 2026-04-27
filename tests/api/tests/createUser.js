@@ -11,12 +11,15 @@ import { ADMIN_ERRORS, KEY_ERRORS, ROLE } from '../../utils/responseTitles.js';
 import { RequestSpecs } from '../../utils/requestSpecs.js';
 import { ResponseSpecs } from '../../utils/responseSpecs.js';
 import { ValidatedRequester } from '../../utils/validatedRequester.js';
+import { isApiVersion } from '../../utils/apiVersion.js';
+import { DatabaseSteps } from '../../utils/database/databaseSteps.js';
 
 describe('Admin Servise tests', function () {
   let userId;
   const adminAuth = RequestSpecs.withConfig(ApiConfig.adminAuth);
 
   after(async () => {
+    if (!userId) return;
     await AdminSteps.deleteUser(userId);
   });
 
@@ -35,14 +38,21 @@ describe('Admin Servise tests', function () {
     userId = responseData.id;
     await assertThatModels(requestData, responseData).match();
 
-    const { data } = await new ValidatedRequester(
-      adminAuth,
-      ENDPOINT_KEY.ADMIN_GET_ALL_USERS,
-      ResponseSpecs.okArrayBy('users'),
-    ).get({ stepName: 'Get all users' });
+    if (isApiVersion('with_database')) {
+      const userDao = await DatabaseSteps.findUserByUsername(responseData.username, {
+        stepName: `Verify user "${responseData.username}" in database`,
+      });
+      expect(userDao).to.exist;
+    } else {
+      const { data } = await new ValidatedRequester(
+        adminAuth,
+        ENDPOINT_KEY.ADMIN_GET_ALL_USERS,
+        ResponseSpecs.okArrayBy('users'),
+      ).get({ stepName: 'Get all users' });
 
-    const { users } = data;
-    expect(users.find(user => user.username === responseData.username)).to.exist;
+      const { users } = data;
+      expect(users.find(user => user.username === responseData.username)).to.exist;
+    }
   });
 
   const invalidDataUsername = [

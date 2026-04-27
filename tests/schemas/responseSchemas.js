@@ -1,14 +1,15 @@
 const transactionSchema = {
   type: 'object',
-  required: ['id', 'amount', 'type', 'timestamp', 'relatedAccountId'],
+  required: ['id', 'amount', 'type', 'timestamp'],
   properties: {
     id: { type: 'integer' },
     amount: { type: 'number' },
     type: { type: 'string' },
     timestamp: { type: 'string' },
     relatedAccountId: { type: 'integer' },
+    accountId: { type: 'integer' },
   },
-  additionalProperties: false,
+  additionalProperties: true,
 };
 
 const accountSchema = {
@@ -23,7 +24,7 @@ const accountSchema = {
       items: transactionSchema,
     },
   },
-  additionalProperties: false,
+  additionalProperties: true,
 };
 
 export const createUserResponseSchema = {
@@ -55,7 +56,14 @@ export const createAccountResponseSchema = {
 };
 
 export const accountDepositResponseSchema = {
-  ...accountSchema,
+  anyOf: [
+    accountSchema,
+    { type: 'array' },
+    { type: 'string' },
+    { type: 'null' },
+    { type: 'number' },
+    { type: 'boolean' },
+  ],
 };
 
 export const accountTransferResponseSchema = {
@@ -98,8 +106,23 @@ export const putCustomerProfileResponseSchema = {
 };
 
 export const customerAccountsResponseSchema = {
-  type: 'array',
-  items: accountSchema,
+  anyOf: [
+    {
+      type: 'array',
+      items: accountSchema,
+    },
+    {
+      type: 'object',
+      required: ['accounts'],
+      properties: {
+        accounts: {
+          type: 'array',
+          items: accountSchema,
+        },
+      },
+      additionalProperties: true,
+    },
+  ],
 };
 
 export const responseSchemaMap = {

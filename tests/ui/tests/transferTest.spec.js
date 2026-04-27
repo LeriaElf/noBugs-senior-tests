@@ -7,10 +7,7 @@ import { parseAlertAmount, parseAlertAccount } from '../utils/patterns.js';
 import { generateNonExistentAccount } from '../utils/generateNonExistentAccount.js';
 import { setupSenderWithAccount } from '../../helpers/setupSenderWithAccount.js';
 import { ApiConfig } from '../../utils/apiConfig.js';
-import { ENDPOINT_KEY } from '../../utils/enpoints.js';
-import { ValidatedRequester } from '../../utils/validatedRequester.js';
-import { RequestSpecs } from '../../utils/requestSpecs.js';
-import { ResponseSpecs } from '../../utils/responseSpecs.js';
+import { getAccountByNumberFromBackend } from '../utils/backendState.js';
 
 test.describe('Transfer Service Tests', () => {
   test("@UserSession(amount=1); User should be able to transfer valid amount between user's accounts", async ({
@@ -44,7 +41,10 @@ test.describe('Transfer Service Tests', () => {
       const transferPage = new TransferPage(page);
       await transferPage.titleIsVisible();
 
-      await transferPage.accountForm.chooseAccount(firstAccount.accountNumber);
+      await transferPage.accountForm.chooseAccount(
+        firstAccount.accountNumber,
+        firstAccount.accountId,
+      );
       await transferPage.accountForm.fillRecipientName(userName);
       await transferPage.accountForm.fillRecipientAccount(secondAccount.accountNumber);
       await transferPage.accountForm.enterAmount(firstAccount.balance);
@@ -57,24 +57,22 @@ test.describe('Transfer Service Tests', () => {
       expect(parseAlertAmount(alertMessage)).toBe(firstAccount.balance);
       expect(parseAlertAccount(alertMessage)).toBe(secondAccount.accountNumber);
 
-      const { data } = await new ValidatedRequester(
-        RequestSpecs.withConfig(userAuth),
-        ENDPOINT_KEY.CUSTOMER_ACCOUNTS,
-        ResponseSpecs.okArrayBy('accounts'),
-      ).get();
-
-      const { accounts } = data;
-      const senderAccount = accounts.find(acc => acc.accountNumber === firstAccount.accountNumber);
+      const senderAccount = await getAccountByNumberFromBackend(
+        firstAccount.accountNumber,
+        userAuth,
+      );
       expect(senderAccount.balance).toBe(0);
 
-      const receiverAccount = accounts.find(
-        acc => acc.accountNumber === secondAccount.accountNumber,
+      const receiverAccount = await getAccountByNumberFromBackend(
+        secondAccount.accountNumber,
+        userAuth,
       );
       expect(receiverAccount.balance).toBe(firstAccount.balance + secondAccount.balance);
 
       await page.reload();
       const visibleBalance = await transferPage.accountForm.getSelectedAccountBalance(
         secondAccount.accountNumber,
+        secondAccount.accountId,
       );
       expect(Number(visibleBalance)).toBe(firstAccount.balance + secondAccount.balance);
     });
@@ -87,16 +85,15 @@ test.describe('Transfer Service Tests', () => {
   }) => {
     const userDashboard = new UserDashboard(page);
 
-    const { senderSteps, senderAccount, recipientSteps, recipientAccount, recipientName } =
+    const { senderAccount, recipientAccount, recipientName, senderToken, recipientToken } =
       await test.step('Precondition: create users, authorize, create accounts', async () => {
         const {
-          steps: senderSteps,
           token,
           accounts: [senderAccount],
         } = await setupSenderWithAccount({ withUserSession });
 
         const {
-          steps: recipientSteps,
+          token: recipientToken,
           accounts: [recipientAccount],
           userName: recipientName,
         } = await setupSenderWithAccount({ withUserSession });
@@ -105,11 +102,11 @@ test.describe('Transfer Service Tests', () => {
         await userDashboard.expectLoaded();
 
         return {
-          senderSteps,
           senderAccount,
-          recipientSteps,
           recipientAccount,
           recipientName,
+          senderToken: token,
+          recipientToken,
         };
       });
 
@@ -119,7 +116,10 @@ test.describe('Transfer Service Tests', () => {
       const transferPage = new TransferPage(page);
       await transferPage.titleIsVisible();
 
-      await transferPage.accountForm.chooseAccount(senderAccount.accountNumber);
+      await transferPage.accountForm.chooseAccount(
+        senderAccount.accountNumber,
+        senderAccount.accountId,
+      );
       await transferPage.accountForm.fillRecipientName(recipientName);
       await transferPage.accountForm.fillRecipientAccount(recipientAccount.accountNumber);
       await transferPage.accountForm.enterAmount(senderAccount.balance);
@@ -132,15 +132,15 @@ test.describe('Transfer Service Tests', () => {
       expect(parseAlertAmount(alertMessage)).toBe(senderAccount.balance);
       expect(parseAlertAccount(alertMessage)).toBe(recipientAccount.accountNumber);
 
-      const { accounts } = await senderSteps.getCustomerAccaunts();
-      const senderAccountApi = accounts.find(
-        acc => acc.accountNumber === senderAccount.accountNumber,
+      const senderAccountApi = await getAccountByNumberFromBackend(
+        senderAccount.accountNumber,
+        ApiConfig.getUserAuth(senderToken),
       );
       expect(senderAccountApi.balance).toBe(0);
 
-      const { accounts: recipientAccounts } = await recipientSteps.getCustomerAccaunts();
-      const recipientAccountApi = recipientAccounts.find(
-        acc => acc.accountNumber === recipientAccount.accountNumber,
+      const recipientAccountApi = await getAccountByNumberFromBackend(
+        recipientAccount.accountNumber,
+        ApiConfig.getUserAuth(recipientToken),
       );
       expect(recipientAccountApi.balance).toBe(senderAccount.balance + recipientAccount.balance);
     });
@@ -173,7 +173,7 @@ test.describe('Transfer Service Tests', () => {
 
       await transferPage.titleIsVisible();
 
-      await transferPage.accountForm.chooseAccount(account.accountNumber);
+      await transferPage.accountForm.chooseAccount(account.accountNumber, account.accountId);
       await transferPage.accountForm.fillRecipientName(userName);
       await transferPage.accountForm.fillRecipientAccount(
         generateNonExistentAccount(account.accountNumber),
@@ -185,14 +185,7 @@ test.describe('Transfer Service Tests', () => {
         transferPage.clickTransferButton(),
       );
 
-      const { data } = await new ValidatedRequester(
-        RequestSpecs.withConfig(userAuth),
-        ENDPOINT_KEY.CUSTOMER_ACCOUNTS,
-        ResponseSpecs.okArrayBy('accounts'),
-      ).get();
-
-      const { accounts } = data;
-      const senderAccount = accounts.find(acc => acc.accountNumber === account.accountNumber);
+      const senderAccount = await getAccountByNumberFromBackend(account.accountNumber, userAuth);
       expect(senderAccount.balance).toBe(account.balance);
     });
   });
@@ -248,7 +241,7 @@ test.describe('Transfer Service Tests', () => {
 
       await transferPage.titleIsVisible();
 
-      await transferPage.accountForm.chooseAccount(account.accountNumber);
+      await transferPage.accountForm.chooseAccount(account.accountNumber, account.accountId);
       await transferPage.accountForm.fillRecipientName(userName);
       await transferPage.accountForm.fillRecipientAccount(account.accountNumber);
       await transferPage.accountForm.enterAmount('0');
@@ -258,14 +251,7 @@ test.describe('Transfer Service Tests', () => {
         transferPage.clickTransferButton(),
       );
 
-      const { data } = await new ValidatedRequester(
-        RequestSpecs.withConfig(userAuth),
-        ENDPOINT_KEY.CUSTOMER_ACCOUNTS,
-        ResponseSpecs.okArrayBy('accounts'),
-      ).get();
-
-      const { accounts } = data;
-      const senderAccount = accounts.find(acc => acc.accountNumber === account.accountNumber);
+      const senderAccount = await getAccountByNumberFromBackend(account.accountNumber, userAuth);
       expect(senderAccount.balance).toBe(account.balance);
     });
   });
@@ -296,7 +282,7 @@ test.describe('Transfer Service Tests', () => {
       const transferPage = new TransferPage(page);
       await transferPage.titleIsVisible();
 
-      await transferPage.accountForm.chooseAccount(account.accountNumber);
+      await transferPage.accountForm.chooseAccount(account.accountNumber, account.accountId);
       await transferPage.accountForm.fillRecipientName(userName);
       await transferPage.accountForm.fillRecipientAccount(account.accountNumber);
       await transferPage.accountForm.enterAmount(account.balance);
@@ -306,14 +292,7 @@ test.describe('Transfer Service Tests', () => {
         transferPage.clickTransferButton(),
       );
 
-      const { data } = await new ValidatedRequester(
-        RequestSpecs.withConfig(userAuth),
-        ENDPOINT_KEY.CUSTOMER_ACCOUNTS,
-        ResponseSpecs.okArrayBy('accounts'),
-      ).get();
-
-      const { accounts } = data;
-      const senderAccount = accounts.find(acc => acc.accountNumber === account.accountNumber);
+      const senderAccount = await getAccountByNumberFromBackend(account.accountNumber, userAuth);
       expect(senderAccount.balance).toBe(account.balance);
     });
   });

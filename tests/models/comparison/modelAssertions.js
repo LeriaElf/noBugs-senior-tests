@@ -1,6 +1,7 @@
 import { compareModels } from './modelComparator.js';
 import { loadComparisonRules, getRuleFor } from './modelComparisonConfig.js';
 import { fileURLToPath } from 'url';
+import { stepLogger } from '../../utils/stepLogger.js';
 
 export const assertThatModels = (request, response) => new ModelAssertions(request, response);
 
@@ -24,32 +25,40 @@ class ModelAssertions {
     return this;
   }
 
-  async match() {
-    let rules;
-    if (this.configPath) {
-      rules = await loadComparisonRules(this.configPath);
-    }
-
-    let fieldMappings;
-    if (this.customMappings) {
-      fieldMappings = this.customMappings;
-    } else if (rules) {
-      const rule = getRuleFor(rules, this.request.constructor?.name || 'default');
-      if (!rule) {
-        throw new Error(`No comparison rule found for model: ${this.request.constructor?.name}`);
+  async match({ stepName = null } = {}) {
+    const action = async () => {
+      let rules;
+      if (this.configPath) {
+        rules = await loadComparisonRules(this.configPath);
       }
-      fieldMappings = rule.fieldMappings;
-    } else {
-      throw new Error('Neither mappings nor config provided');
+
+      let fieldMappings;
+      if (this.customMappings) {
+        fieldMappings = this.customMappings;
+      } else if (rules) {
+        const rule = getRuleFor(rules, this.request.constructor?.name || 'default');
+        if (!rule) {
+          throw new Error(`No comparison rule found for model: ${this.request.constructor?.name}`);
+        }
+        fieldMappings = rule.fieldMappings;
+      } else {
+        throw new Error('Neither mappings nor config provided');
+      }
+
+      const result = compareModels(this.request, this.response, fieldMappings);
+
+      if (!result.success) {
+        const errorMsg = ['Model comparison failed:', ...result.mismatches.map(m => `- ${m}`)].join(
+          '\n',
+        );
+        throw new Error(errorMsg);
+      }
+    };
+
+    if (stepName) {
+      return await stepLogger.step(stepName, action);
     }
 
-    const result = compareModels(this.request, this.response, fieldMappings);
-
-    if (!result.success) {
-      const errorMsg = ['Model comparison failed:', ...result.mismatches.map(m => `- ${m}`)].join(
-        '\n',
-      );
-      throw new Error(errorMsg);
-    }
+    return await action();
   }
 }

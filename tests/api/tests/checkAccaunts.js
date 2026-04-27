@@ -6,13 +6,18 @@ import { AdminSteps } from '../../utils/steps/adminSteps.js';
 import { RequestSpecs } from '../../utils/requestSpecs.js';
 import { ResponseSpecs } from '../../utils/responseSpecs.js';
 import { ValidatedRequester } from '../../utils/validatedRequester.js';
+import { skipUnlessVersion } from '../../utils/apiVersion.js';
 
 describe('Account Servise tests', function () {
   let token;
   let userId;
   let auth;
 
-  before(async () => {
+  before(function () {
+    if (skipUnlessVersion('with_validation_fix')) this.skip();
+  });
+
+  before(async function () {
     const response = await userSteps.createUserWithAccounts();
     token = response.token;
     userId = response.userId;
@@ -20,6 +25,7 @@ describe('Account Servise tests', function () {
   });
 
   after(async () => {
+    if (!userId) return;
     await AdminSteps.deleteUser(userId);
   });
 

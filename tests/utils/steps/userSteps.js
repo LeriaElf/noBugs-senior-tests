@@ -6,6 +6,7 @@ import { AccountDepositRequest } from '../../models/accountDepositRequest.js';
 import { AdminSteps } from './adminSteps.js';
 import { HTTP_STATUS } from '../httpStatus.js';
 import { stepLogger } from '../stepLogger.js';
+import { isApiVersion } from '../apiVersion.js';
 
 export class UserSteps {
   constructor({ username, password, token } = {}) {
@@ -77,6 +78,30 @@ export class UserSteps {
     return await stepLogger.step(
       `Deposit amount "${depositAmount}" to account "${accountId}"`,
       async () => {
+        if (isApiVersion('with_database')) {
+          const data = new AccountDepositRequest({
+            id: accountId,
+            balance: depositAmount,
+          });
+
+          await stepLogger.request('post', '/accounts/deposit', data.toJson());
+          const response = await requester.httpClient.post(
+            '/accounts/deposit',
+            data.toJson(),
+            ApiConfig.getUserAuth(token),
+          );
+          await stepLogger.response(response.status);
+
+          const { accounts } = await this.getCustomerAccaunts(token);
+          const account = accounts.find(acc => acc.id === accountId);
+
+          return {
+            status: response.status,
+            balance: account?.balance,
+            transactions: account?.transactions ?? [],
+          };
+        }
+
         const response = await requester.request(ENDPOINT_KEY.ACCOUNTS_DEPOSIT, {
           data: new AccountDepositRequest({
             id: accountId,
@@ -118,7 +143,8 @@ export class UserSteps {
         config: ApiConfig.getUserAuth(token),
       });
 
-      return { status: response.status, accounts: response.data.accounts };
+      const accounts = Array.isArray(response.data) ? response.data : response.data.accounts;
+      return { status: response.status, accounts };
     });
   }
 

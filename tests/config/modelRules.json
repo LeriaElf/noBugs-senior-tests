@@ -10,5 +10,13 @@
   "AccountTransferRequest": {
     "target": "AccountTransferResponse",
     "fields": ["senderAccountId", "receiverAccountId", "amount"]
+  },
+  "CreateUserResponse": {
+    "target": "UserDao",
+    "fields": ["username", "role"]
+  },
+  "CreateAccountResponse": {
+    "target": "AccountDao",
+    "fields": ["accountNumber", "balance"]
   }
 }
