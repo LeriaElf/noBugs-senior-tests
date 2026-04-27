@@ -1,0 +1,7 @@
+{
+  "method": "PUT",
+  "url": "/customer/profile",
+  "body": {
+    "name": "Qwe Wqe"
+  }
+}
